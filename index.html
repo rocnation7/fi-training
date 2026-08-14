@@ -28,6 +28,13 @@
   .hero h1{font-size:clamp(2.75rem,6vw,4.5rem);color:var(--lam-sage);margin:1.5rem 0 .5rem}
   .hero p{margin:0;max-width:52ch;color:rgba(255,255,255,.92)}
   .hero .kicker{color:rgba(255,255,255,.75)}
+  .enrollment{margin-top:1.5rem;max-width:640px;padding:1rem 1.1rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3)}
+  .enrollment p{font-size:.875rem;margin:0 0 .75rem}
+  .enrollment-form{display:flex;gap:.6rem;flex-wrap:wrap}
+  .enrollment input{flex:1 1 190px;min-width:0;padding:.65rem .75rem;border:1px solid rgba(255,255,255,.55);font:inherit;color:var(--lam-onyx);background:var(--lam-parchment)}
+  .enrollment .btn{background:var(--lam-parchment);border-color:var(--lam-parchment);color:var(--lam-sapphire)}
+  .enrollment .btn:hover{background:var(--lam-sage);border-color:var(--lam-sage)}
+  .enrollment-status{display:block;margin-top:.65rem;font-size:.8125rem;color:rgba(255,255,255,.9)}
 
   /* sticky progress */
   .strip{position:sticky;top:0;z-index:20;background:var(--lam-parchment);border-bottom:var(--rule);padding:.6rem 0}
@@ -54,6 +61,8 @@
   /* video player */
   .video{margin:0 0 1.5rem}
   .video-player{display:block;width:100%;aspect-ratio:16/9;background:var(--lam-ink-blue)}
+  .video-locked,.check-locked{padding:1.25rem;background:var(--lam-light-grey);border:var(--rule);color:#4F5B66;font-size:.875rem}
+  .check-locked{border-width:0 0 1px;padding:1rem .25rem}
   .video-cap{font-size:.75rem;color:#4F5B66;margin:.5rem 0 0}
 
   /* accordion */
@@ -139,6 +148,15 @@
       <p class="kicker" style="margin:1.25rem 0 0">Internal Training &middot; Sales Team</p>
       <h1>Fixed Income Fluency</h1>
       <p>Three video blocks, nine knowledge checks, one capstone. Prepared ahead of the launch of Lazard&rsquo;s three fixed income ETFs.</p>
+      <section class="enrollment" aria-labelledby="enrollment-title">
+        <p id="enrollment-title"><b>Start your training</b> &mdash; enter your details to save your completion record.</p>
+        <form class="enrollment-form" id="enrollment-form">
+          <input id="learner-name" name="fullName" type="text" autocomplete="name" placeholder="Full name" required>
+          <input id="learner-email" name="email" type="email" autocomplete="email" placeholder="Email address" required>
+          <button class="btn" type="submit">Start training</button>
+        </form>
+        <span class="enrollment-status" id="enrollment-status" aria-live="polite">Your training will unlock once your details are saved.</span>
+      </section>
     </div>
   </header>
 
@@ -771,10 +789,11 @@
 
   /* ---- Configuration -------------------------------------------------- */
   var CONFIG = {
-    REQUIRE_BLOCKS_BEFORE_CAPSTONE: false, /* set true to hard-lock the capstone */
+    REQUIRE_BLOCKS_BEFORE_CAPSTONE: true,
     SHUFFLE_OPTIONS: true,                 /* set false to keep the printed A-D order */
     PASS_MARK: 12,
-    STORAGE_KEY: "fi-fluency:v1"
+    STORAGE_KEY: "fi-fluency:v2",
+    API_URL: "/api/training"
   };
 
   var DATA = JSON.parse(document.getElementById("fi-data").textContent);
@@ -785,26 +804,34 @@
     answers: {},            /* qid -> original option index */
     revealed: {},           /* checkId -> true */
     order: {},              /* qid -> array of original indices, display order */
+    videos: {},             /* block id -> watched to completion */
+    learner: null,
     capstone: { answers:{}, submitted:false, attempts:0, best:null }
   };
 
-  /* Optional persistence. Degrades silently when window.storage is absent
-     (e.g. after export into an LMS or intranet page). */
+  /* Uses the host storage integration when available and browser storage on Vercel. */
   var store = {
-    available: function(){ return typeof window !== "undefined" && window.storage && typeof window.storage.get === "function"; },
+    available: function(){ return typeof window !== "undefined"; },
     load: function(){
       if(!this.available()) return Promise.resolve(null);
-      return window.storage.get(CONFIG.STORAGE_KEY)
-        .then(function(r){ return r && r.value ? JSON.parse(r.value) : null; })
-        .catch(function(){ return null; });
+      if(window.storage && typeof window.storage.get === "function"){
+        return window.storage.get(CONFIG.STORAGE_KEY).then(function(r){ return r && r.value ? JSON.parse(r.value) : null; }).catch(function(){ return null; });
+      }
+      try { return Promise.resolve(JSON.parse(window.localStorage.getItem(CONFIG.STORAGE_KEY) || "null")); } catch(e) { return Promise.resolve(null); }
     },
     save: function(){
       if(!this.available()) return;
-      try { window.storage.set(CONFIG.STORAGE_KEY, JSON.stringify(state)); } catch(e){}
+      try {
+        if(window.storage && typeof window.storage.set === "function") window.storage.set(CONFIG.STORAGE_KEY, JSON.stringify(state));
+        else window.localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state));
+      } catch(e){}
     },
     clear: function(){
       if(!this.available()) return;
-      try { window.storage.delete(CONFIG.STORAGE_KEY); } catch(e){}
+      try {
+        if(window.storage && typeof window.storage.delete === "function") window.storage.delete(CONFIG.STORAGE_KEY);
+        else window.localStorage.removeItem(CONFIG.STORAGE_KEY);
+      } catch(e){}
     }
   };
 
@@ -878,10 +905,50 @@
     return { answered: answered, correct: correct, total: check.questions.length, revealed: !!state.revealed[check.id] };
   }
 
+  function learnerReady(){ return !!(state.learner && state.learner.id); }
+  function isBlockComplete(block){ return block.checks.every(function(c){ return !!state.revealed[c.id]; }); }
+  function isBlockUnlocked(blockIndex){
+    return blockIndex === 0 || isBlockComplete(DATA.blocks[blockIndex - 1]);
+  }
+  function isCheckUnlocked(blockIndex, checkIndex){
+    if(!isBlockUnlocked(blockIndex)) return false;
+    if(!state.videos[DATA.blocks[blockIndex].id]) return false;
+    return checkIndex === 0 || !!state.revealed[DATA.blocks[blockIndex].checks[checkIndex - 1].id];
+  }
+
+  function syncProgress(includeAnswers){
+    if(!learnerReady()) return Promise.resolve();
+    var completedChecks = [];
+    DATA.blocks.forEach(function(b){ b.checks.forEach(function(c){ if(state.revealed[c.id]) completedChecks.push(c.id); }); });
+    return fetch(CONFIG.API_URL, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        learnerId: state.learner.id,
+        completedChecks: completedChecks,
+        completedVideos: Object.keys(state.videos).filter(function(id){ return state.videos[id]; }),
+        capstoneAnswers: includeAnswers ? state.capstone.answers : null
+      })
+    }).then(function(r){
+      if(!r.ok) throw new Error("Unable to save training progress.");
+      return r.json();
+    }).then(function(result){
+      if(result.completed) document.getElementById("enrollment-status").textContent = "Training completed and recorded.";
+      return result;
+    }).catch(function(){
+      document.getElementById("enrollment-status").textContent = "Your progress is saved on this device. It will sync when the training service is available.";
+    });
+  }
+
   function renderBlocks(){
     var host = document.getElementById("blocks");
     var html = "";
-    DATA.blocks.forEach(function(b){
+    if(!learnerReady()){
+      host.innerHTML = '<section class="howto"><h3>Enter your details to begin</h3><p>Your full name and email are required before the training materials can be opened.</p></section>';
+      return;
+    }
+    DATA.blocks.forEach(function(b, blockIndex){
+      var blockUnlocked = isBlockUnlocked(blockIndex);
       html += '<section class="block" id="' + b.id + '">';
       html +=   '<div class="block-head"><div class="meta"><div>'
             +     '<p class="kicker">' + b.label + '</p>'
@@ -889,13 +956,20 @@
             +     '<p class="sub">' + b.sub + '</p>'
             +   '</div><span class="time">' + b.time + '</span></div></div>';
 
-      html +=   '<div class="video"><video class="video-player" controls preload="metadata" playsinline>'
-            +     '<source src="' + encodeURI(b.video.src) + '" type="video/mp4">'
-            +     'Your browser does not support HTML5 video.'
-            +   '</video><p class="video-cap">Watch this block before opening the knowledge checks below.</p></div>';
+      html +=   '<div class="video">' + (blockUnlocked
+            ? '<video class="video-player" data-video="' + b.id + '" controls preload="metadata" playsinline><source src="' + encodeURI(b.video.src) + '" type="video/mp4">Your browser does not support HTML5 video.</video>'
+            : '<div class="video-locked">Complete ' + DATA.blocks[blockIndex - 1].title + ' before opening this block.</div>')
+            + '<p class="video-cap">' + (state.videos[b.id] ? 'Video complete. Continue to the knowledge checks.' : 'Watch this video to the end to unlock the first knowledge check.') + '</p></div>';
 
       html +=   '<div class="checks">';
-      b.checks.forEach(function(c){
+      b.checks.forEach(function(c, checkIndex){
+        if(!isCheckUnlocked(blockIndex, checkIndex)){
+          var message = !blockUnlocked ? 'Complete the previous block to unlock this knowledge check.'
+            : !state.videos[b.id] ? 'Finish this block\'s video to unlock Knowledge Check ' + c.n + '.'
+            : 'Complete Knowledge Check ' + b.checks[checkIndex - 1].n + ' to unlock this section.';
+          html += '<div class="check-locked"><b>Knowledge Check ' + c.n + ' &mdash; ' + c.title + '</b><br>' + message + '</div>';
+          return;
+        }
         var st = checkStatus(c);
         var pillCls = st.revealed ? "pill done" : (st.answered ? "pill part" : "pill");
         var pillTxt = st.revealed
@@ -979,6 +1053,11 @@
     var result = document.getElementById("cap-result");
     var qHost = document.getElementById("cap-questions");
     var actions = document.getElementById("cap-actions");
+    if(!learnerReady()){
+      gate.innerHTML = '<div class="gate"><b>Registration required.</b> Enter your full name and email above to begin training.</div>';
+      result.innerHTML = ""; qHost.innerHTML = ""; actions.innerHTML = "";
+      return;
+    }
     var done = checksComplete();
     var locked = CONFIG.REQUIRE_BLOCKS_BEFORE_CAPSTONE && done < totalChecks();
 
@@ -1063,6 +1142,43 @@
   }
 
   /* ---- Events --------------------------------------------------------- */
+  document.getElementById("enrollment-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var form = e.currentTarget;
+    var button = form.querySelector("button");
+    var status = document.getElementById("enrollment-status");
+    var fullName = form.elements.fullName.value.trim();
+    var email = form.elements.email.value.trim().toLowerCase();
+    if(!fullName || !email) return;
+    button.disabled = true;
+    status.textContent = "Saving your details…";
+    fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fullName: fullName, email: email })
+    }).then(function(r){
+      if(!r.ok) throw new Error("Unable to register.");
+      return r.json();
+    }).then(function(learner){
+      state.learner = learner;
+      store.save();
+      form.hidden = true;
+      status.textContent = "Welcome, " + learner.fullName + ". Your progress is being recorded.";
+      renderBlocks(); renderCapstone(); updateProgress();
+    }).catch(function(){
+      status.textContent = "We could not save your details. Please try again.";
+      button.disabled = false;
+    });
+  });
+
+  document.addEventListener("ended", function(e){
+    var video = e.target;
+    if(video.tagName !== "VIDEO" || !video.dataset.video) return;
+    state.videos[video.dataset.video] = true;
+    store.save();
+    renderBlocks(); renderCapstone(); syncProgress(false);
+  }, true);
+
   document.addEventListener("change", function(e){
     var input = e.target;
     if(input.tagName !== "INPUT" || input.type !== "radio") return;
@@ -1120,7 +1236,7 @@
 
     if(t.dataset && t.dataset.submit){
       var c = findCheck(t.dataset.submit);
-      if(c){ state.revealed[c.id] = true; refreshCheck(c); renderCapstone(); store.save(); }
+      if(c){ state.revealed[c.id] = true; store.save(); renderBlocks(); renderCapstone(); syncProgress(false); }
       return;
     }
     if(t.dataset && t.dataset.retry){
@@ -1139,6 +1255,7 @@
       state.capstone.best = state.capstone.best === null ? sc : Math.max(state.capstone.best, sc);
       renderCapstone();
       store.save();
+      syncProgress(true);
       document.getElementById("cap-result").scrollIntoView({ behavior:"smooth", block:"center" });
       return;
     }
@@ -1151,8 +1268,10 @@
       return;
     }
     if(t.id === "reset-all"){
-      state = { answers:{}, revealed:{}, order:{}, capstone:{ answers:{}, submitted:false, attempts:0, best:null } };
+      state = { answers:{}, revealed:{}, order:{}, videos:{}, learner:null, capstone:{ answers:{}, submitted:false, attempts:0, best:null } };
       store.clear();
+      document.getElementById("enrollment-form").hidden = false;
+      document.getElementById("enrollment-status").textContent = "Your training will unlock once your details are saved.";
       renderBlocks(); renderCapstone(); updateProgress();
       return;
     }
@@ -1164,7 +1283,13 @@
       state.answers = saved.answers || {};
       state.revealed = saved.revealed || {};
       state.order = saved.order || {};
+      state.videos = saved.videos || {};
+      state.learner = saved.learner || null;
       state.capstone = saved.capstone || state.capstone;
+    }
+    if(learnerReady()){
+      document.getElementById("enrollment-form").hidden = true;
+      document.getElementById("enrollment-status").textContent = "Welcome back, " + state.learner.fullName + ". Your progress is being recorded.";
     }
     renderBlocks();
     renderCapstone();
