@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/fi-fluency-assessments%20(1).html"
-    }
-  ]
-}
