@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Fixed Income Fluency training for the sales team.">
+<title>Fixed Income Fluency</title>
+<style>
+  :root{
+    --lam-sapphire:#00539A; --lam-parchment:#FFFFFF; --lam-onyx:#171A1C;
+    --lam-ink-blue:#23283C; --lam-clarity:#EBF4FA; --lam-moss:#495A4A;
+    --lam-sage:#EEF3E8; --lam-light-grey:#F5F5F5; --lam-highlight-grey:#CBD2D8;
+    --lam-data-red:#BC4124; --lam-data-dark-green:#51744E;
+    --font-display:"VC Garamond Condensed","Cormorant Garamond","EB Garamond",Georgia,serif;
+    --font-body:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --rule:1px solid rgba(23,26,28,.14);
+  }
+  *{box-sizing:border-box}
+  .fi{font-family:var(--font-body);color:var(--lam-onyx);background:var(--lam-parchment);line-height:1.5;font-size:16px}
+  .fi h1,.fi h2{font-family:var(--font-display);font-weight:300;letter-spacing:-.02em;line-height:.98;margin:0}
+  .fi h3,.fi h4{font-family:var(--font-body);margin:0;line-height:1.25;letter-spacing:0}
+  .wrap{width:min(940px,calc(100% - 2.5rem));margin:0 auto}
+  .kicker{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+
+  /* hero */
+  .hero{background:var(--lam-sapphire);color:var(--lam-parchment);padding:2.75rem 0 2.25rem}
+  .logo-ph{display:inline-block;border:1px dashed rgba(255,255,255,.55);padding:.4rem .6rem;font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.85)}
+  .hero h1{font-size:clamp(2.75rem,6vw,4.5rem);color:var(--lam-sage);margin:1.5rem 0 .5rem}
+  .hero p{margin:0;max-width:52ch;color:rgba(255,255,255,.92)}
+  .hero .kicker{color:rgba(255,255,255,.75)}
+
+  /* sticky progress */
+  .strip{position:sticky;top:0;z-index:20;background:var(--lam-parchment);border-bottom:var(--rule);padding:.6rem 0}
+  .strip-in{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+  .bar{flex:1 1 180px;height:4px;background:var(--lam-highlight-grey);position:relative;min-width:120px}
+  .bar span{position:absolute;inset:0 auto 0 0;background:var(--lam-sapphire);width:0;transition:width .3s}
+  .strip small{font-size:.75rem;color:#4F5B66;white-space:nowrap}
+
+  /* sections */
+  main{padding:2.5rem 0 0}
+  .howto{background:var(--lam-clarity);padding:1.5rem 1.75rem;border-left:3px solid var(--lam-sapphire);margin-bottom:3rem}
+  .howto h3{font-size:1.0625rem;font-weight:700;margin-bottom:.5rem}
+  .howto p{margin:0 0 .5rem;font-size:.9375rem;max-width:74ch}
+  .howto p:last-child{margin:0}
+
+  .block{margin:0 0 3.25rem}
+  .block-head{border-top:2px solid var(--lam-onyx);padding-top:1rem;margin-bottom:1.5rem}
+  .block-head .meta{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+  .block-head .kicker{color:var(--lam-sapphire)}
+  .block-head h2{font-size:clamp(2rem,3.6vw,2.875rem);margin:.35rem 0 .25rem}
+  .block-head .sub{font-size:.9375rem;color:#4F5B66;margin:0}
+  .time{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4F5B66;white-space:nowrap}
+
+  /* video player */
+  .video{margin:0 0 1.5rem}
+  .video-player{display:block;width:100%;aspect-ratio:16/9;background:var(--lam-ink-blue)}
+  .video-cap{font-size:.75rem;color:#4F5B66;margin:.5rem 0 0}
+
+  /* accordion */
+  .checks{border-top:var(--rule)}
+  details.check{border-bottom:var(--rule)}
+  details.check>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.75rem;padding:1rem .25rem}
+  details.check>summary::-webkit-details-marker{display:none}
+  .chev{flex:0 0 auto;width:11px;height:11px;border-right:2px solid var(--lam-sapphire);border-bottom:2px solid var(--lam-sapphire);transform:rotate(45deg);transition:transform .2s;margin-right:.15rem}
+  details[open]>summary .chev{transform:rotate(-135deg)}
+  .ck-title{flex:1 1 auto;font-weight:700;font-size:1rem}
+  .ck-title em{font-style:normal;font-weight:400;color:#4F5B66}
+  .pill{flex:0 0 auto;font-size:.6875rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.3rem .55rem;border:1px solid var(--lam-highlight-grey);color:#4F5B66;background:var(--lam-light-grey)}
+  .pill.done{background:var(--lam-sage);border-color:#c9d8bd;color:var(--lam-data-dark-green)}
+  .pill.part{background:var(--lam-clarity);border-color:#c5dcee;color:var(--lam-sapphire)}
+  .ck-body{padding:.25rem .25rem 1.75rem}
+
+  /* questions */
+  .q{padding:1.25rem 0;border-top:1px dashed rgba(23,26,28,.14)}
+  .q:first-child{border-top:none;padding-top:.25rem}
+  .q-stem{display:flex;gap:.7rem;margin-bottom:.85rem}
+  .q-num{flex:0 0 auto;font-weight:700;color:var(--lam-sapphire);font-variant-numeric:tabular-nums}
+  .q-stem p{margin:0;font-size:.9375rem;max-width:76ch}
+  .opts{display:grid;gap:.4rem;margin:0 0 0 1.9rem}
+  .opt{display:flex;gap:.65rem;align-items:flex-start;padding:.6rem .75rem;border:1px solid var(--lam-highlight-grey);cursor:pointer;font-size:.9375rem;background:var(--lam-parchment);transition:background .15s,border-color .15s}
+  .opt:hover{background:var(--lam-light-grey)}
+  .opt input{margin:.25rem 0 0;accent-color:var(--lam-sapphire);flex:0 0 auto}
+  .opt .ltr{flex:0 0 auto;font-weight:700;color:#4F5B66}
+  .opt.sel{border-color:var(--lam-sapphire);background:var(--lam-clarity)}
+  .locked .opt{cursor:default}
+  .locked .opt:hover{background:var(--lam-parchment)}
+  .locked .opt.sel{background:var(--lam-clarity)}
+  .opt.right{border-color:var(--lam-data-dark-green);background:var(--lam-sage)}
+  .opt.wrong{border-color:var(--lam-data-red);background:#fbf0ed}
+  .fb{margin:.75rem 0 0 1.9rem;padding:.75rem .9rem;font-size:.875rem;border-left:3px solid var(--lam-highlight-grey);background:var(--lam-light-grey);max-width:76ch}
+  .fb.right{border-left-color:var(--lam-data-dark-green)}
+  .fb.wrong{border-left-color:var(--lam-data-red)}
+  .fb b{display:block;margin-bottom:.2rem}
+  .fb .ref{display:block;margin-top:.35rem;color:#4F5B66;font-size:.8125rem}
+
+  /* actions */
+  .actions{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;margin-top:1.5rem}
+  .btn{font-family:var(--font-body);font-size:.875rem;font-weight:700;letter-spacing:.02em;padding:.75rem 1.35rem;border:1px solid var(--lam-sapphire);background:var(--lam-sapphire);color:var(--lam-parchment);cursor:pointer}
+  .btn:hover{background:#00447f;border-color:#00447f}
+  .btn[disabled]{opacity:.4;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--lam-sapphire)}
+  .btn.ghost:hover{background:var(--lam-clarity)}
+  .score{font-size:.875rem;font-weight:700}
+  .score.pass{color:var(--lam-data-dark-green)}
+  .score.fail{color:var(--lam-data-red)}
+  .note{font-size:.8125rem;color:#4F5B66}
+
+  /* capstone */
+  .capstone{background:var(--lam-onyx);color:var(--lam-parchment);padding:2.5rem 0 3rem;margin-top:1rem}
+  .capstone h2{color:var(--lam-sage);font-size:clamp(2.25rem,4.5vw,3.5rem);margin:.35rem 0 .5rem}
+  .capstone .kicker{color:rgba(255,255,255,.6)}
+  .capstone .sub{color:rgba(255,255,255,.85);font-size:.9375rem;margin:0;max-width:60ch}
+  .cap-card{background:var(--lam-parchment);color:var(--lam-onyx);padding:1.75rem;margin-top:1.75rem}
+  .gate{background:var(--lam-clarity);border-left:3px solid var(--lam-sapphire);padding:.9rem 1rem;font-size:.875rem;margin-bottom:1.5rem}
+  .result{border:1px solid var(--lam-highlight-grey);padding:1.5rem;margin-bottom:1.75rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}
+  .result .big{font-family:var(--font-display);font-size:3.5rem;line-height:1;font-weight:300}
+  .result.pass .big{color:var(--lam-data-dark-green)}
+  .result.fail .big{color:var(--lam-data-red)}
+  .result .verdict{font-weight:700;font-size:1.0625rem;margin:0 0 .3rem}
+  .result .rx{margin:0;font-size:.875rem;color:#4F5B66;max-width:56ch}
+  .weak{margin:.6rem 0 0;font-size:.875rem}
+  .weak span{display:inline-block;background:var(--lam-clarity);color:var(--lam-sapphire);font-weight:700;padding:.15rem .5rem;margin:.15rem .3rem .15rem 0;font-size:.8125rem}
+
+  footer{border-top:var(--rule);margin-top:3rem;padding:1.5rem 0 3rem}
+  footer p{font-size:.6875rem;color:#4F5B66;margin:0 0 .4rem;max-width:80ch}
+  @media(max-width:640px){
+    .opts{margin-left:0}
+    .fb{margin-left:0}
+    .q-stem{gap:.5rem}
+  }
+</style>
+</head>
+<body>
+
+<div class="fi">
+  <header class="hero">
+    <div class="wrap">
+      <div class="logo-ph">[LAM logo asset required here]</div>
+      <p class="kicker" style="margin:1.25rem 0 0">Internal Training &middot; Sales Team</p>
+      <h1>Fixed Income Fluency</h1>
+      <p>Three video blocks, nine knowledge checks, one capstone. Prepared ahead of the launch of Lazard&rsquo;s three fixed income ETFs.</p>
+    </div>
+  </header>
+
+  <div class="strip">
+    <div class="wrap strip-in">
+      <small id="p-label">Knowledge checks: 0 of 9 complete</small>
+      <div class="bar"><span id="p-bar"></span></div>
+      <small id="p-cap">Capstone: not attempted</small>
+      <button class="btn ghost" id="reset-all" style="padding:.4rem .7rem;font-size:.75rem">Reset</button>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="howto">
+      <h3>How to Use This Session</h3>
+      <p>Work through each block in order: watch the video, then open the knowledge checks beneath it. Each check is scenario-based on purpose &mdash; the goal is not to recite definitions but to make the right call in a live conversation. Commit to an answer before you check it; the explanation appears either way.</p>
+      <p>Finish with the 15-question capstone. Score 12 or better and you are conversation-ready. Anything you miss points you back to a specific section.</p>
+    </section>
+
+    <div id="blocks"></div>
+  </main>
+
+  <section class="capstone">
+    <div class="wrap">
+      <p class="kicker">Capstone &middot; 8 Minutes</p>
+      <h2>Final Assessment</h2>
+      <p class="sub">15 questions across all three blocks. Target: 12 correct. Answers are withheld until you submit.</p>
+      <div class="cap-card">
+        <div id="cap-gate"></div>
+        <div id="cap-result"></div>
+        <div id="cap-questions"></div>
+        <div class="actions" id="cap-actions"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <p><b>Internal use only.</b> Figures in worked examples are illustrative and rounded for teaching purposes. Any market data, yields, or performance references must be verified against current factsheets and approved by Compliance before use in client conversations or materials.</p>
+    <p>Answer options are presented in randomised order, so the letter of a correct answer will not match the printed answer key in Appendix B.</p>
+  </footer>
+</div>
+
+<script type="application/json" id="fi-data">
+{
+  "blocks": [
+    {
+      "id": "b1",
+      "label": "Block 1",
+      "title": "How Bonds Behave",
+      "sub": "The mechanics behind every client conversation",
+      "time": "32 min",
+      "video": { "title": "How Bonds Behave", "runtime": "Video 1 of 3", "src": "How_Bonds_Behave.mp4" },
+      "checks": [
+        {
+          "id": "kc1", "n": 1, "sec": "1.1", "title": "Price and Yield",
+          "questions": [
+            {
+              "id": "1.1",
+              "stem": "The Fed&rsquo;s hiking cycle pushes new-issue yields from 4% to 5%. A client&rsquo;s existing 4%-coupon bond will most likely:",
+              "options": [
+                "Rise in price, because its coupon is now scarce",
+                "Fall in price, so that a buyer would earn roughly the new 5% market yield",
+                "Stay at par, because the coupon is fixed",
+                "Stop paying its coupon until rates fall back"
+              ],
+              "answer": 1,
+              "why": "Existing bonds must reprice so buyers earn the going rate. The coupon never changes; the price does."
+            },
+            {
+              "id": "1.2",
+              "stem": "A client asks: &lsquo;If I just hold my bond to maturity, does the price drop even matter?&rsquo; The most accurate response is:",
+              "options": [
+                "No &mdash; price declines are an accounting fiction",
+                "Yes &mdash; you will receive less than par at maturity",
+                "Partly &mdash; the promised cash flows are unchanged, but you bear the opportunity cost of being locked in below today&rsquo;s rates",
+                "Yes &mdash; the coupon resets lower when the price falls"
+              ],
+              "answer": 2,
+              "why": "Cash flows are contractual; the loss is opportunity cost, not a haircut to par. This distinction calms more clients than any statistic."
+            },
+            {
+              "id": "1.3",
+              "stem": "A bond is trading above par. Without knowing anything else, you know that:",
+              "options": [
+                "Its coupon is above current market yields for comparable bonds",
+                "Its coupon is below current market yields",
+                "It must be close to maturity",
+                "Its issuer&rsquo;s credit has deteriorated"
+              ],
+              "answer": 0,
+              "why": "Premium pricing exists precisely because the bond&rsquo;s fixed coupon beats what the market now offers."
+            }
+          ]
+        },
+        {
+          "id": "kc2", "n": 2, "sec": "1.2", "title": "Yield Measures",
+          "questions": [
+            {
+              "id": "2.1",
+              "stem": "A prospect wants to compare our new ETF against two competitors on income. The single most appropriate number to line up across all three is:",
+              "options": [
+                "Distribution yield, because it is real cash paid",
+                "Average portfolio YTM, because it is forward-looking",
+                "30-day SEC yield, because it is standardised and net of expenses",
+                "The weighted average coupon"
+              ],
+              "answer": 2,
+              "why": "Only the SEC yield is calculated identically everywhere and net of fees &mdash; the fair comparison."
+            },
+            {
+              "id": "2.2",
+              "stem": "Rates rose sharply six months ago. Our ETF shows portfolio YTM of 5.0% but a distribution yield of 3.9%. The most likely explanation:",
+              "options": [
+                "The fund is underperforming its index",
+                "Distributions reflect older, lower-coupon bonds; the portfolio&rsquo;s forward-looking yield has already repriced higher",
+                "The expense ratio consumes the difference",
+                "The fund is returning capital to shareholders"
+              ],
+              "answer": 1,
+              "why": "Distribution yield is a rear-view mirror; portfolio YTM reprices instantly when rates move."
+            },
+            {
+              "id": "2.3",
+              "stem": "A client asks, &lsquo;So which yield will I actually get?&rsquo; The most honest and effective answer:",
+              "options": [
+                "The SEC yield &mdash; that is what you will earn",
+                "The distribution yield &mdash; cash paid is what counts",
+                "Whichever is highest, since yields converge over time",
+                "These are snapshots, not promises &mdash; the portfolio&rsquo;s current yield is the best estimate of return over time, and it will move with the market"
+              ],
+              "answer": 3,
+              "why": "Credibility comes from framing yields as estimates. Starting yield anchors expected return; it is not a contract."
+            }
+          ]
+        },
+        {
+          "id": "kc3", "n": 3, "sec": "1.3", "title": "Duration, Convexity, and Call Risk",
+          "questions": [
+            {
+              "id": "3.1",
+              "stem": "A portfolio has a duration of 6. Rates rise 0.5%. The approximate immediate price impact is:",
+              "options": ["&minus;0.5%", "&minus;3%", "&minus;6%", "&minus;12%"],
+              "answer": 1,
+              "why": "Duration 6 &times; 0.5% move = roughly 3% price impact, in the opposite direction. Scale linearly for small moves."
+            },
+            {
+              "id": "3.2",
+              "stem": "A client is anxious about rising rates but wants to stay invested in bonds. The most responsive move along the duration spectrum:",
+              "options": [
+                "Extend duration to capture more yield",
+                "Shift toward a short-duration strategy (duration ~2&ndash;3), cutting rate sensitivity while keeping the income",
+                "Move entirely to 30-year Treasuries",
+                "Duration is irrelevant if she holds to maturity"
+              ],
+              "answer": 1,
+              "why": "Duration is the dial. Short duration cuts sensitivity dramatically while still locking in income cash can&rsquo;t."
+            },
+            {
+              "id": "3.3",
+              "stem": "Rates rally hard and a portfolio heavy in callable bonds lags a similar non-callable portfolio. The most likely cause:",
+              "options": [
+                "Callable bonds have higher credit risk",
+                "Negative convexity &mdash; issuers&rsquo; right to call caps the bonds&rsquo; price upside just when rates fall",
+                "Callable bonds have no duration",
+                "The portfolio&rsquo;s SEC yield was too high"
+              ],
+              "answer": 1,
+              "why": "The issuer&rsquo;s call right caps appreciation &mdash; negative convexity shows up exactly when rates rally."
+            },
+            {
+              "id": "3.4",
+              "stem": "A callable corporate bond shows a yield to maturity of 5.4% and a yield to worst of 4.9%. The number to anchor a client conversation on is:",
+              "options": [
+                "5.4% &mdash; YTM is the standard quote",
+                "The average of the two",
+                "4.9% &mdash; YTW is the floor the client can count on if the issuer calls the bond",
+                "Neither; only the coupon matters"
+              ],
+              "answer": 2,
+              "why": "YTW is the floor across every call scenario. Quoting YTM on a callable bond sets an expectation the issuer can take away."
+            }
+          ]
+        },
+        {
+          "id": "kc4", "n": 4, "sec": "1.4", "title": "Sources of Return, Carry, and Roll-Down",
+          "questions": [
+            {
+              "id": "4.1",
+              "stem": "Over a multi-year holding period, the best single predictor of a high-quality bond portfolio&rsquo;s annualised return is:",
+              "options": ["Last year&rsquo;s total return", "Its starting yield", "The Fed&rsquo;s next move", "Its expense ratio"],
+              "answer": 1,
+              "why": "Income compounds relentlessly; price moves wash out over full periods. Starting yield is roughly the expected long-run return."
+            },
+            {
+              "id": "4.2",
+              "stem": "Which pair of conditions made 2022 uniquely damaging for bonds?",
+              "options": [
+                "High starting yields and slow rate hikes",
+                "Near-zero starting yields and the fastest hiking cycle in decades",
+                "Wide credit spreads and heavy defaults",
+                "Falling rates and negative convexity"
+              ],
+              "answer": 1,
+              "why": "No income cushion plus a record rate shock produced the outlier. Neither condition holds at today&rsquo;s starting yields."
+            },
+            {
+              "id": "4.3",
+              "stem": "A portfolio yields 5% with duration 6. If rates rise 1% over the next year, the total return is closest to:",
+              "options": [
+                "&minus;6%, the full duration hit",
+                "&minus;1%, because income offsets most of the price decline",
+                "+5%, because income always dominates",
+                "0% by definition"
+              ],
+              "answer": 1,
+              "why": "&minus;6% price plus roughly 5% income is about &minus;1%. The cushion math is the single most persuasive chart-free argument in the book."
+            },
+            {
+              "id": "4.4",
+              "stem": "A PM says the fund offers &lsquo;5.2% of carry and roll-down.&rsquo; The most accurate translation for a client:",
+              "options": [
+                "The fund is guaranteed to return 5.2%",
+                "If markets are roughly unchanged for a year, the portfolio&rsquo;s income plus the price drift from bonds aging down the curve should produce about 5.2% &mdash; the base case, not a floor",
+                "The fund charges 5.2% in fees",
+                "The fund&rsquo;s duration is 5.2"
+              ],
+              "answer": 1,
+              "why": "Carry and roll is the do-nothing return &mdash; a base case with market moves layered on top, never a guarantee."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "label": "Block 2",
+      "title": "Reading the Market",
+      "sub": "The curve, the Fed, spreads &mdash; the language of every institutional conversation",
+      "time": "26 min",
+      "video": { "title": "Reading the Market", "runtime": "Video 2 of 3", "src": "Reading_the_Market.mp4" },
+      "checks": [
+        {
+          "id": "kc5", "n": 5, "sec": "2.1", "title": "The Yield Curve",
+          "questions": [
+            {
+              "id": "5.1",
+              "stem": "A PM expects the Fed to cut aggressively while long-term inflation expectations stay anchored. The curve trade that matches that view:",
+              "options": [
+                "A flattener",
+                "A bull steepener &mdash; positioned for short yields to fall faster than long yields",
+                "Shorting the belly",
+                "A bear steepener"
+              ],
+              "answer": 1,
+              "why": "Short yields falling faster than long yields is a bull steepener &mdash; the classic Fed-cutting-cycle shape."
+            },
+            {
+              "id": "5.2",
+              "stem": "&lsquo;Long the belly&rsquo; most nearly means:",
+              "options": [
+                "Overweight the shortest T-bills",
+                "Overweight intermediate (~5&ndash;7yr) maturities versus the benchmark",
+                "Overweight 30-year bonds",
+                "Holding maximum cash"
+              ],
+              "answer": 1,
+              "why": "The belly is the intermediate segment; &lsquo;long&rsquo; means overweight versus benchmark."
+            },
+            {
+              "id": "5.3",
+              "stem": "An inverted curve has historically been read as a signal that:",
+              "options": [
+                "Inflation is about to accelerate",
+                "The market expects short rates to be cut &mdash; often preceding slowdowns",
+                "Credit spreads are too tight",
+                "Long bonds are riskless"
+              ],
+              "answer": 1,
+              "why": "Inversion prices future cuts; historically it has led slowdowns, though timing varies widely."
+            }
+          ]
+        },
+        {
+          "id": "kc6", "n": 6, "sec": "2.2", "title": "The Fed and Forward Rates",
+          "questions": [
+            {
+              "id": "6.1",
+              "stem": "The Fed cuts 25 bps and the 10-year Treasury yield rises the same week. The best explanation:",
+              "options": [
+                "A data error &mdash; they must move together",
+                "The long end is set by market expectations; if the cut stokes inflation or supply concerns, long yields can rise as short yields fall",
+                "The Fed also controls the 10-year and chose to raise it",
+                "Bond markets were closed"
+              ],
+              "answer": 1,
+              "why": "The Fed sets overnight money. The 10-year prices growth, inflation, and term premium &mdash; and can disagree with the Fed loudly."
+            },
+            {
+              "id": "6.2",
+              "stem": "A strategist on a client call says &lsquo;the 5y5y has been drifting higher all quarter.&rsquo; Broadly, she means:",
+              "options": [
+                "The Fed has pre-announced hikes five years out",
+                "The market&rsquo;s long-run rate expectation is moving up &mdash; growth, inflation, or supply concerns, not next-meeting noise",
+                "5-year bonds now yield more than 10-year bonds",
+                "Credit spreads on 5-year corporates widened"
+              ],
+              "answer": 1,
+              "why": "The 5y5y isolates the long-run expectation; a drift higher means the market&rsquo;s structural rate view is rising, whatever the next meeting brings."
+            },
+            {
+              "id": "6.3",
+              "stem": "The 5y5y forward has been falling for three months. A reasonable read:",
+              "options": [
+                "The market is raising its long-run rate expectations",
+                "The market is lowering its long-run rate expectations &mdash; supportive for intermediate and long bonds even before the Fed moves",
+                "Credit risk is rising",
+                "The curve must be inverted"
+              ],
+              "answer": 1,
+              "why": "A falling 5y5y is the market marking down its long-run rate view &mdash; a tailwind for duration even before any cut."
+            }
+          ]
+        },
+        {
+          "id": "kc7", "n": 7, "sec": "2.3", "title": "Credit Spreads",
+          "questions": [
+            {
+              "id": "7.1",
+              "stem": "Recession fears spike. All else equal, you would expect:",
+              "options": [
+                "Credit spreads to tighten",
+                "Credit spreads to widen, with high yield widening most",
+                "Treasury yields and spreads to move identically",
+                "Spreads to be unaffected"
+              ],
+              "answer": 1,
+              "why": "Spreads are the price of credit fear; they widen fastest at the low-quality end."
+            },
+            {
+              "id": "7.2",
+              "stem": "Spreads at multi-decade tights most directly imply:",
+              "options": [
+                "Credit is risk-free",
+                "Investors are being paid relatively little extra to bear credit risk &mdash; less cushion, more need for selectivity",
+                "Defaults are impossible",
+                "Treasuries yield more than corporates"
+              ],
+              "answer": 1,
+              "why": "A thin cushion means indiscriminate exposure is poorly paid &mdash; dispersion and selection carry returns."
+            },
+            {
+              "id": "7.3",
+              "stem": "In a sharp risk-off month, a high-yield portfolio falls while Treasuries rally. The mechanism:",
+              "options": [
+                "High yield has no duration",
+                "Spread widening on high yield overwhelmed the benefit of falling Treasury yields",
+                "The Fed raised rates on corporates only",
+                "Convexity turned negative"
+              ],
+              "answer": 1,
+              "why": "Two engines pulling in opposite directions; in high yield the spread engine usually wins a panic."
+            }
+          ]
+        },
+        {
+          "id": "kc8", "n": 8, "sec": "2.4", "title": "Derivatives",
+          "questions": [
+            {
+              "id": "8.1",
+              "stem": "A PM wants to cut the fund&rsquo;s duration today without selling bonds. The standard tool:",
+              "options": ["Buy more long bonds", "Sell Treasury futures", "Buy an interest rate floor", "Halt redemptions"],
+              "answer": 1,
+              "why": "Selling futures sheds duration in one trade at minimal cost &mdash; the whole point of the tool."
+            },
+            {
+              "id": "8.2",
+              "stem": "An interest rate swap is best described as:",
+              "options": [
+                "A loan between two governments",
+                "An agreement to exchange fixed-rate payments for floating-rate payments over a set period",
+                "An option to buy Treasuries",
+                "A type of high yield bond"
+              ],
+              "answer": 1,
+              "why": "A fixed-for-floating exchange over a term &mdash; that is the entire instrument."
+            },
+            {
+              "id": "8.3",
+              "stem": "A client says: &lsquo;Derivatives means leverage, and I don&rsquo;t do leverage.&rsquo; Your most effective frame:",
+              "options": [
+                "Agree and change the subject",
+                "Explain the fund holds only derivatives",
+                "Distinguish purpose: here they manage risk and cut implementation costs within disclosed limits &mdash; standard institutional practice, not speculative leverage",
+                "Note that derivatives are not in the prospectus"
+              ],
+              "answer": 2,
+              "why": "Purpose is the distinction: risk management within disclosed limits versus speculative leverage. Say it plainly and it stops being scary."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "label": "Block 3",
+      "title": "The Conversation",
+      "sub": "The five conversations &mdash; including the wrapper question &mdash; that will decide the launch",
+      "time": "20 min",
+      "video": { "title": "The Conversation", "runtime": "Video 3 of 3", "src": "Client_Convos___ETF_Mechanics.mp4" },
+      "checks": [
+        {
+          "id": "kc9", "n": 9, "sec": "3.1", "title": "The Conversations",
+          "questions": [
+            {
+              "id": "9.1",
+              "stem": "A client wants to move a bond allocation to a money market fund &lsquo;until things calm down.&rsquo; The most complete risk framing:",
+              "options": [
+                "Cash is always the safe choice",
+                "Cash swaps mark-to-market rate risk for reinvestment risk &mdash; if the Fed cuts, the cash yield vanishes and the client misses both the locked-in income and the price rally",
+                "Money markets are federally guaranteed",
+                "Bond prices cannot fall further, so stay"
+              ],
+              "answer": 1,
+              "why": "Risk versus risk: mark-to-market risk traded for reinvestment risk. Name both and let the client&rsquo;s goal pick."
+            },
+            {
+              "id": "9.2",
+              "stem": "The strongest single rebuttal to &lsquo;60/40 is dead&rsquo; is:",
+              "options": [
+                "Equities will fall soon",
+                "Correlation between stocks and bonds never changes",
+                "The 2022 failure came from a rate shock off zero yields; at today&rsquo;s starting yields the 40 provides real income plus its diversification role",
+                "60/40 was never a real strategy"
+              ],
+              "answer": 2,
+              "why": "Concede the year, attack the cause: a rate shock off zero. Today&rsquo;s yields restore both the income and the ballast case."
+            },
+            {
+              "id": "9.3",
+              "stem": "For a $200,000 allocation, the strongest structural case for a bond ETF over buying individual bonds is:",
+              "options": [
+                "Individual bonds are illegal below $1 million",
+                "Diversification across hundreds of issuers, professional management, and institutional execution &mdash; versus dealer markups and concentration at that size",
+                "ETFs never decline in price",
+                "Individual bonds pay no coupons"
+              ],
+              "answer": 1,
+              "why": "At most account sizes, individual bonds mean dealer markups and concentration; the wrapper delivers institutional breadth and execution at any size."
+            },
+            {
+              "id": "9.4",
+              "stem": "A client worries a newly launched bond ETF &lsquo;barely trades.&rsquo; The most accurate one-line reassurance:",
+              "options": [
+                "Volume will grow eventually",
+                "An ETF&rsquo;s real liquidity comes from its underlying bonds &mdash; shares can be created and redeemed against that market regardless of screen volume",
+                "The issuer guarantees a price floor",
+                "Bond ETFs cannot trade at discounts"
+              ],
+              "answer": 1,
+              "why": "Look through the wrapper: liquidity lives in the underlying bonds, reachable via creation and redemption at any volume level (machinery in Appendix D)."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "capstone": [
+    {
+      "id": "c1", "ref": "1.3",
+      "stem": "Rates fall 1%. A conventional (non-callable) bond portfolio with duration 6 will most likely:",
+      "options": ["Fall about 6%", "Rise about 6% &mdash; slightly more once convexity is counted", "Be unchanged", "Rise exactly its coupon"],
+      "answer": 1,
+      "why": "Duration gives roughly +6%; positive convexity means the actual gain runs slightly ahead of the duration estimate for larger moves."
+    },
+    {
+      "id": "c2", "ref": "1.2",
+      "stem": "The one yield metric calculated identically, by SEC mandate, across every bond fund is:",
+      "options": ["Distribution yield", "Average portfolio YTM", "30-day SEC yield", "Weighted average coupon"],
+      "answer": 2,
+      "why": "It is the standardised, net-of-expenses comparison metric."
+    },
+    {
+      "id": "c3", "ref": "1.4",
+      "stem": "The primary reason 2022 was historically bad for bonds:",
+      "options": [
+        "Mass corporate defaults",
+        "A record rate shock hitting portfolios with almost no starting income cushion",
+        "ETF structural failure",
+        "Negative convexity across the market"
+      ],
+      "answer": 1,
+      "why": "Near-zero starting yields plus the fastest hiking cycle in decades: maximum price hit, minimal offsetting income."
+    },
+    {
+      "id": "c4", "ref": "1.4",
+      "stem": "Over long horizons, most of a high-quality bond portfolio&rsquo;s total return has historically come from:",
+      "options": ["Price appreciation", "Income and its reinvestment", "Currency moves", "Spread tightening"],
+      "answer": 1,
+      "why": "Income dominates over full periods, which is why starting yield is the best long-run return estimate."
+    },
+    {
+      "id": "c5", "ref": "1.1",
+      "stem": "A client&rsquo;s bond shows a paper loss but she will hold to maturity. Assuming no default, at maturity she receives:",
+      "options": ["The depressed market price", "Par value, plus all remaining coupons along the way", "Par minus the paper loss", "Whatever the Fed sets"],
+      "answer": 1,
+      "why": "Rate moves change the mark, not the promised cash flows."
+    },
+    {
+      "id": "c6", "ref": "2.1",
+      "stem": "A bear steepener is best described as:",
+      "options": [
+        "Short yields falling faster than long yields",
+        "Long yields rising faster than short yields &mdash; often inflation or supply driven",
+        "The whole curve shifting down",
+        "The belly outperforming the wings"
+      ],
+      "answer": 1,
+      "why": "Both steepeners widen the long/short gap; the bear version comes from the long end selling off."
+    },
+    {
+      "id": "c7", "ref": "1.3",
+      "stem": "A callable municipal bond quotes YTM 5.4% and YTW 4.9%. Rates have fallen since issuance. The prudent number to set the client&rsquo;s expectation:",
+      "options": [
+        "5.4% &mdash; always quote yield to maturity",
+        "5.15%, splitting the difference",
+        "4.9% &mdash; with rates down, a call is likely, and YTW is the assured floor",
+        "The coupon rate"
+      ],
+      "answer": 2,
+      "why": "Falling rates make the call probable; YTW is the lowest outcome across call dates and maturity &mdash; the honest quote."
+    },
+    {
+      "id": "c8", "ref": "2.2",
+      "stem": "A Fed rate cut is announced; long-maturity bond funds sell off. The mechanism:",
+      "options": [
+        "Impossible &mdash; cuts lower all yields",
+        "The market read the cut as inflationary or fiscally risky, lifting long-end yields the Fed doesn&rsquo;t control",
+        "Duration switched signs",
+        "The SEC repriced NAVs"
+      ],
+      "answer": 1,
+      "why": "The Fed sets the overnight rate; the long end prices expectations and term premium."
+    },
+    {
+      "id": "c9", "ref": "2.3",
+      "stem": "Credit spreads at multi-decade tights argue most directly for:",
+      "options": [
+        "Abandoning credit entirely",
+        "Maximum high-yield exposure",
+        "Selectivity &mdash; the cushion is thin and issuer-level dispersion does the work, favouring active management",
+        "Ignoring credit quality"
+      ],
+      "answer": 2,
+      "why": "Tight spreads compress the reward for indiscriminate risk; selection matters more."
+    },
+    {
+      "id": "c10", "ref": "2.3",
+      "stem": "In a risk-off shock, the typical first-order behaviour is:",
+      "options": [
+        "Treasuries rally, credit spreads widen &mdash; high yield most",
+        "Everything in fixed income falls equally",
+        "Spreads tighten as investors seek yield",
+        "Treasuries and high yield both rally identically"
+      ],
+      "answer": 0,
+      "why": "Flight to quality lifts Treasuries while the price of credit risk rises."
+    },
+    {
+      "id": "c11", "ref": "2.4",
+      "stem": "A PM needs to cut duration within the hour, cheaply. The standard tool:",
+      "options": ["Sell every bond over 10 years", "Sell Treasury futures", "Buy a swaption", "Suspend the NAV"],
+      "answer": 1,
+      "why": "One futures trade achieves the risk reduction without cash-market transaction costs."
+    },
+    {
+      "id": "c12", "ref": "1.4",
+      "stem": "On an upward-sloping curve, a fund&rsquo;s &lsquo;roll-down&rsquo; return comes from:",
+      "options": [
+        "The Fed cutting rates each year",
+        "Bonds becoming shorter as they age, being repriced at the lower yields of shorter maturities, and drifting up in price",
+        "Credit spreads widening",
+        "Reinvesting coupons at higher rates"
+      ],
+      "answer": 1,
+      "why": "Aging down an upward curve produces a small capital gain with no rate move at all &mdash; carry&rsquo;s quiet partner. It reverses on an inverted curve."
+    },
+    {
+      "id": "c13", "ref": "3.1",
+      "stem": "The best gauge of a bond ETF&rsquo;s capacity to absorb a large order is:",
+      "options": [
+        "Yesterday&rsquo;s share volume",
+        "The liquidity of its underlying bonds, accessed through the primary market",
+        "Its expense ratio",
+        "Its distribution yield"
+      ],
+      "answer": 1,
+      "why": "Screen volume is the visible layer; creation and redemption against the underlying market is the deep one."
+    },
+    {
+      "id": "c14", "ref": "3.1",
+      "stem": "A prospect with a $250,000 fixed income sleeve compares an ETF, a mutual fund, and a self-built ladder of individual bonds. The ETF&rsquo;s most defensible edge at that size:",
+      "options": [
+        "It cannot lose value",
+        "Broad issuer diversification, professional management, and institutional execution &mdash; versus dealer markups and thin diversification in a small ladder",
+        "It pays a higher coupon than any bond",
+        "It has no duration"
+      ],
+      "answer": 1,
+      "why": "At retail sizes, individual bonds carry markups and concentration; the wrapper delivers institutional access at any account size."
+    },
+    {
+      "id": "c15", "ref": "3.1",
+      "stem": "A client asks whether to wait in cash for &lsquo;more clarity&rsquo; before buying bonds. The strongest professional frame:",
+      "options": [
+        "Clarity will come; waiting is free",
+        "Cash is riskless in every sense",
+        "Waiting swaps one risk for another: cash yield disappears when the Fed cuts, and the client misses both locked-in income and the rally &mdash; decide which risk serves the goal",
+        "Bonds only make sense at the exact top in yields"
+      ],
+      "answer": 2,
+      "why": "Risk versus risk, anchored in reinvestment risk &mdash; the core cash-conversation frame."
+    }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- Configuration -------------------------------------------------- */
+  var CONFIG = {
+    REQUIRE_BLOCKS_BEFORE_CAPSTONE: false, /* set true to hard-lock the capstone */
+    SHUFFLE_OPTIONS: true,                 /* set false to keep the printed A-D order */
+    PASS_MARK: 12,
+    STORAGE_KEY: "fi-fluency:v1"
+  };
+
+  var DATA = JSON.parse(document.getElementById("fi-data").textContent);
+  var LETTERS = ["A","B","C","D","E","F"];
+
+  /* ---- State ---------------------------------------------------------- */
+  var state = {
+    answers: {},            /* qid -> original option index */
+    revealed: {},           /* checkId -> true */
+    order: {},              /* qid -> array of original indices, display order */
+    capstone: { answers:{}, submitted:false, attempts:0, best:null }
+  };
+
+  /* Optional persistence. Degrades silently when window.storage is absent
+     (e.g. after export into an LMS or intranet page). */
+  var store = {
+    available: function(){ return typeof window !== "undefined" && window.storage && typeof window.storage.get === "function"; },
+    load: function(){
+      if(!this.available()) return Promise.resolve(null);
+      return window.storage.get(CONFIG.STORAGE_KEY)
+        .then(function(r){ return r && r.value ? JSON.parse(r.value) : null; })
+        .catch(function(){ return null; });
+    },
+    save: function(){
+      if(!this.available()) return;
+      try { window.storage.set(CONFIG.STORAGE_KEY, JSON.stringify(state)); } catch(e){}
+    },
+    clear: function(){
+      if(!this.available()) return;
+      try { window.storage.delete(CONFIG.STORAGE_KEY); } catch(e){}
+    }
+  };
+
+  /* ---- Helpers -------------------------------------------------------- */
+  function allQuestions(){
+    var out = [];
+    DATA.blocks.forEach(function(b){
+      b.checks.forEach(function(c){ c.questions.forEach(function(q){ out.push(q); }); });
+    });
+    return out;
+  }
+  function totalChecks(){
+    var n = 0;
+    DATA.blocks.forEach(function(b){ n += b.checks.length; });
+    return n;
+  }
+  function displayOrder(q){
+    if(state.order[q.id]) return state.order[q.id];
+    var idx = q.options.map(function(_,i){ return i; });
+    if(CONFIG.SHUFFLE_OPTIONS){
+      for(var i = idx.length - 1; i > 0; i--){
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = idx[i]; idx[i] = idx[j]; idx[j] = t;
+      }
+    }
+    state.order[q.id] = idx;
+    return idx;
+  }
+
+  /* ---- Rendering: knowledge checks ------------------------------------ */
+  function questionHTML(q, opts){
+    var group = opts.group;
+    var revealed = opts.revealed;
+    var chosen = opts.chosen;
+    var order = displayOrder(q);
+
+    var html = '<div class="q' + (revealed ? " locked" : "") + '" data-qid="' + q.id + '">';
+    html += '<div class="q-stem"><span class="q-num">' + opts.number + '</span><p>' + q.stem + '</p></div>';
+    html += '<div class="opts">';
+    order.forEach(function(origIdx, pos){
+      var cls = "opt";
+      if(chosen === origIdx) cls += " sel";
+      if(revealed){
+        if(origIdx === q.answer) cls += " right";
+        else if(chosen === origIdx) cls += " wrong";
+      }
+      html += '<label class="' + cls + '">'
+            +   '<input type="radio" name="' + group + "-" + q.id + '" value="' + origIdx + '"'
+            +     (chosen === origIdx ? " checked" : "") + (revealed ? " disabled" : "") + '>'
+            +   '<span class="ltr">' + LETTERS[pos] + '.</span>'
+            +   '<span>' + q.options[origIdx] + '</span>'
+            + '</label>';
+    });
+    html += '</div>';
+
+    if(revealed){
+      var right = chosen === q.answer;
+      html += '<div class="fb ' + (right ? "right" : "wrong") + '">'
+            +   '<b>' + (right ? "Correct" : (chosen === undefined ? "Not answered" : "Not quite")) + '</b>'
+            +   q.why
+            + (opts.ref ? '<span class="ref">Review section ' + opts.ref + '</span>' : "")
+            + '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function checkStatus(check){
+    var answered = check.questions.filter(function(q){ return state.answers[q.id] !== undefined; }).length;
+    var correct = check.questions.filter(function(q){ return state.answers[q.id] === q.answer; }).length;
+    return { answered: answered, correct: correct, total: check.questions.length, revealed: !!state.revealed[check.id] };
+  }
+
+  function renderBlocks(){
+    var host = document.getElementById("blocks");
+    var html = "";
+    DATA.blocks.forEach(function(b){
+      html += '<section class="block" id="' + b.id + '">';
+      html +=   '<div class="block-head"><div class="meta"><div>'
+            +     '<p class="kicker">' + b.label + '</p>'
+            +     '<h2>' + b.title + '</h2>'
+            +     '<p class="sub">' + b.sub + '</p>'
+            +   '</div><span class="time">' + b.time + '</span></div></div>';
+
+      html +=   '<div class="video"><video class="video-player" controls preload="metadata" playsinline>'
+            +     '<source src="' + encodeURI(b.video.src) + '" type="video/mp4">'
+            +     'Your browser does not support HTML5 video.'
+            +   '</video><p class="video-cap">Watch this block before opening the knowledge checks below.</p></div>';
+
+      html +=   '<div class="checks">';
+      b.checks.forEach(function(c){
+        var st = checkStatus(c);
+        var pillCls = st.revealed ? "pill done" : (st.answered ? "pill part" : "pill");
+        var pillTxt = st.revealed
+              ? st.correct + " of " + st.total + " correct"
+              : (st.answered ? st.answered + " of " + st.total + " answered" : "Not started");
+        html += '<details class="check" id="d-' + c.id + '"' + (st.answered && !st.revealed ? " open" : "") + '>'
+              +   '<summary><span class="chev"></span>'
+              +     '<span class="ck-title">Knowledge Check ' + c.n + ' &mdash; ' + c.title + ' <em>&middot; &sect;' + c.sec + '</em></span>'
+              +     '<span class="' + pillCls + '" data-pill="' + c.id + '">' + pillTxt + '</span>'
+              +   '</summary>'
+              +   '<div class="ck-body" data-body="' + c.id + '">' + checkBodyHTML(c) + '</div>'
+              + '</details>';
+      });
+      html +=   '</div>';
+      html += '</section>';
+    });
+    host.innerHTML = html;
+  }
+
+  function checkBodyHTML(c){
+    var st = checkStatus(c);
+    var html = "";
+    c.questions.forEach(function(q, i){
+      html += questionHTML(q, {
+        group: "kc",
+        number: c.n + "." + (i + 1),
+        revealed: st.revealed,
+        chosen: state.answers[q.id],
+        ref: st.revealed && state.answers[q.id] !== q.answer ? c.sec : null
+      });
+    });
+    html += '<div class="actions">';
+    if(st.revealed){
+      html += '<span class="score ' + (st.correct === st.total ? "pass" : "") + '">Score: ' + st.correct + " / " + st.total + '</span>'
+            + '<button class="btn ghost" data-retry="' + c.id + '">Clear and Try Again</button>';
+    } else {
+      html += '<button class="btn" data-submit="' + c.id + '"' + (st.answered === st.total ? "" : " disabled") + '>Check Answers</button>'
+            + '<span class="note">' + st.answered + " of " + st.total + ' answered</span>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function refreshCheck(c){
+    var body = document.querySelector('[data-body="' + c.id + '"]');
+    if(body) body.innerHTML = checkBodyHTML(c);
+    var st = checkStatus(c);
+    var pill = document.querySelector('[data-pill="' + c.id + '"]');
+    if(pill){
+      pill.className = st.revealed ? "pill done" : (st.answered ? "pill part" : "pill");
+      pill.textContent = st.revealed
+        ? st.correct + " of " + st.total + " correct"
+        : (st.answered ? st.answered + " of " + st.total + " answered" : "Not started");
+    }
+    updateProgress();
+  }
+
+  function findCheck(id){
+    var found = null;
+    DATA.blocks.forEach(function(b){
+      b.checks.forEach(function(c){ if(c.id === id) found = c; });
+    });
+    return found;
+  }
+
+  /* ---- Rendering: capstone -------------------------------------------- */
+  function checksComplete(){
+    var n = 0;
+    DATA.blocks.forEach(function(b){
+      b.checks.forEach(function(c){ if(state.revealed[c.id]) n++; });
+    });
+    return n;
+  }
+
+  function capstoneScore(){
+    return DATA.capstone.filter(function(q){ return state.capstone.answers[q.id] === q.answer; }).length;
+  }
+
+  function renderCapstone(){
+    var gate = document.getElementById("cap-gate");
+    var result = document.getElementById("cap-result");
+    var qHost = document.getElementById("cap-questions");
+    var actions = document.getElementById("cap-actions");
+    var done = checksComplete();
+    var locked = CONFIG.REQUIRE_BLOCKS_BEFORE_CAPSTONE && done < totalChecks();
+
+    gate.innerHTML = done < totalChecks()
+      ? '<div class="gate"><b>' + done + " of " + totalChecks() + ' knowledge checks complete.</b> '
+        + (locked ? "Finish all nine before starting the capstone."
+                  : "You can start the capstone now, but the blocks are the study material for it.")
+        + '</div>'
+      : "";
+
+    if(locked){
+      result.innerHTML = "";
+      qHost.innerHTML = "";
+      actions.innerHTML = "";
+      return;
+    }
+
+    /* Result panel */
+    if(state.capstone.submitted){
+      var sc = capstoneScore();
+      var pass = sc >= CONFIG.PASS_MARK;
+      var verdict, rx;
+      if(sc >= 12){ verdict = "Conversation-ready."; rx = "You can carry these frames into client and consultant meetings."; }
+      else if(sc >= 9){ verdict = "Solid."; rx = "Revisit the sections tied to your misses, listed beneath each question."; }
+      else { verdict = "More work needed."; rx = "Re-run Blocks 1 and 3 before client meetings &mdash; they carry the launch."; }
+
+      var misses = {};
+      DATA.capstone.forEach(function(q){
+        if(state.capstone.answers[q.id] !== q.answer) misses[q.ref] = (misses[q.ref] || 0) + 1;
+      });
+      var missKeys = Object.keys(misses).sort();
+
+      result.innerHTML = '<div class="result ' + (pass ? "pass" : "fail") + '">'
+        + '<div class="big">' + sc + '<span style="font-size:1.25rem;color:#4F5B66"> / ' + DATA.capstone.length + '</span></div>'
+        + '<div><p class="verdict">' + verdict + '</p><p class="rx">' + rx + '</p>'
+        + (missKeys.length ? '<p class="weak">Sections to revisit: ' + missKeys.map(function(k){ return '<span>&sect;' + k + '</span>'; }).join("") + '</p>' : "")
+        + '</div></div>';
+    } else {
+      result.innerHTML = "";
+    }
+
+    /* Questions */
+    var html = "";
+    DATA.capstone.forEach(function(q, i){
+      html += questionHTML(q, {
+        group: "cap",
+        number: String(i + 1),
+        revealed: state.capstone.submitted,
+        chosen: state.capstone.answers[q.id],
+        ref: state.capstone.submitted && state.capstone.answers[q.id] !== q.answer ? q.ref : null
+      });
+    });
+    qHost.innerHTML = html;
+
+    /* Actions */
+    var answered = Object.keys(state.capstone.answers).length;
+    if(state.capstone.submitted){
+      actions.innerHTML = '<button class="btn" id="cap-retake">Retake Capstone</button>'
+        + '<span class="note">Attempt ' + state.capstone.attempts
+        + (state.capstone.best !== null ? " &middot; best score " + state.capstone.best + " / " + DATA.capstone.length : "")
+        + '</span>';
+    } else {
+      actions.innerHTML = '<button class="btn" id="cap-submit"' + (answered === DATA.capstone.length ? "" : " disabled") + '>Submit and Score</button>'
+        + '<span class="note">' + answered + " of " + DATA.capstone.length + ' answered &middot; pass mark ' + CONFIG.PASS_MARK + '</span>';
+    }
+    updateProgress();
+  }
+
+  /* ---- Progress ------------------------------------------------------- */
+  function updateProgress(){
+    var done = checksComplete();
+    var tot = totalChecks();
+    document.getElementById("p-label").textContent = "Knowledge checks: " + done + " of " + tot + " complete";
+    document.getElementById("p-bar").style.width = (done / tot * 100) + "%";
+    var cap = document.getElementById("p-cap");
+    if(state.capstone.submitted){
+      var sc = capstoneScore();
+      cap.textContent = "Capstone: " + sc + " / " + DATA.capstone.length + (sc >= CONFIG.PASS_MARK ? " \u2014 passed" : "");
+    } else {
+      cap.textContent = "Capstone: not attempted";
+    }
+  }
+
+  /* ---- Events --------------------------------------------------------- */
+  document.addEventListener("change", function(e){
+    var input = e.target;
+    if(input.tagName !== "INPUT" || input.type !== "radio") return;
+    var name = input.name || "";
+    var qid = name.slice(name.indexOf("-") + 1);
+    var val = parseInt(input.value, 10);
+
+    if(name.indexOf("kc-") === 0){
+      state.answers[qid] = val;
+      var q = allQuestions().filter(function(x){ return x.id === qid; })[0];
+      var owner = null;
+      DATA.blocks.forEach(function(b){
+        b.checks.forEach(function(c){
+          if(c.questions.some(function(x){ return x.id === qid; })) owner = c;
+        });
+      });
+      /* Update selection styling and the submit button without a full re-render,
+         so radio focus is not lost mid-check. */
+      var wrapEl = input.closest(".q");
+      if(wrapEl){
+        wrapEl.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("sel"); });
+        input.closest(".opt").classList.add("sel");
+      }
+      if(owner){
+        var st = checkStatus(owner);
+        var body = document.querySelector('[data-body="' + owner.id + '"]');
+        var btn = body && body.querySelector("[data-submit]");
+        var note = body && body.querySelector(".note");
+        if(btn) btn.disabled = st.answered !== st.total;
+        if(note) note.textContent = st.answered + " of " + st.total + " answered";
+        var pill = document.querySelector('[data-pill="' + owner.id + '"]');
+        if(pill && !st.revealed){
+          pill.className = "pill part";
+          pill.textContent = st.answered + " of " + st.total + " answered";
+        }
+      }
+    } else if(name.indexOf("cap-") === 0){
+      state.capstone.answers[qid] = val;
+      var wrap2 = input.closest(".q");
+      if(wrap2){
+        wrap2.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("sel"); });
+        input.closest(".opt").classList.add("sel");
+      }
+      var answered = Object.keys(state.capstone.answers).length;
+      var sbtn = document.getElementById("cap-submit");
+      if(sbtn) sbtn.disabled = answered !== DATA.capstone.length;
+      var snote = document.querySelector("#cap-actions .note");
+      if(snote) snote.textContent = answered + " of " + DATA.capstone.length + " answered \u00b7 pass mark " + CONFIG.PASS_MARK;
+    }
+    store.save();
+  });
+
+  document.addEventListener("click", function(e){
+    var t = e.target;
+
+    if(t.dataset && t.dataset.submit){
+      var c = findCheck(t.dataset.submit);
+      if(c){ state.revealed[c.id] = true; refreshCheck(c); renderCapstone(); store.save(); }
+      return;
+    }
+    if(t.dataset && t.dataset.retry){
+      var c2 = findCheck(t.dataset.retry);
+      if(c2){
+        delete state.revealed[c2.id];
+        c2.questions.forEach(function(q){ delete state.answers[q.id]; delete state.order[q.id]; });
+        refreshCheck(c2); renderCapstone(); store.save();
+      }
+      return;
+    }
+    if(t.id === "cap-submit"){
+      state.capstone.submitted = true;
+      state.capstone.attempts += 1;
+      var sc = capstoneScore();
+      state.capstone.best = state.capstone.best === null ? sc : Math.max(state.capstone.best, sc);
+      renderCapstone();
+      store.save();
+      document.getElementById("cap-result").scrollIntoView({ behavior:"smooth", block:"center" });
+      return;
+    }
+    if(t.id === "cap-retake"){
+      state.capstone.submitted = false;
+      state.capstone.answers = {};
+      DATA.capstone.forEach(function(q){ delete state.order[q.id]; });
+      renderCapstone();
+      store.save();
+      return;
+    }
+    if(t.id === "reset-all"){
+      state = { answers:{}, revealed:{}, order:{}, capstone:{ answers:{}, submitted:false, attempts:0, best:null } };
+      store.clear();
+      renderBlocks(); renderCapstone(); updateProgress();
+      return;
+    }
+  });
+
+  /* ---- Boot ----------------------------------------------------------- */
+  function boot(saved){
+    if(saved && saved.answers){
+      state.answers = saved.answers || {};
+      state.revealed = saved.revealed || {};
+      state.order = saved.order || {};
+      state.capstone = saved.capstone || state.capstone;
+    }
+    renderBlocks();
+    renderCapstone();
+    updateProgress();
+  }
+
+  store.load().then(boot).catch(function(){ boot(null); });
+})();
+</script>
+</body>
+</html>
