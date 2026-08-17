@@ -23,18 +23,18 @@
   .kicker{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 
   /* hero */
-  .hero{background:var(--lam-sapphire);color:var(--lam-parchment);padding:2.75rem 0 2.25rem}
-  .logo{display:block;width:min(255px,65vw);height:auto;filter:invert(1);}
-  .hero h1{font-size:clamp(2.75rem,6vw,4.5rem);color:var(--lam-sage);margin:1.5rem 0 .5rem}
+  .hero{background:var(--lam-sapphire);color:var(--lam-parchment);padding:1.4rem 0 1.25rem}
+  .logo{display:block;width:min(155px,48vw);height:auto;filter:invert(1);}
+  .hero h1{font-size:clamp(2.25rem,5vw,3.35rem);color:var(--lam-sage);margin:.55rem 0 .25rem}
   .hero p{margin:0;max-width:52ch;color:rgba(255,255,255,.92)}
   .hero .kicker{color:rgba(255,255,255,.75)}
-  .enrollment{margin-top:1.5rem;max-width:640px;padding:1rem 1.1rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3)}
-  .enrollment p{font-size:.875rem;margin:0 0 .75rem}
+  .enrollment{margin-top:.85rem;max-width:640px;padding:.75rem .85rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3)}
+  .enrollment p{font-size:.8125rem;margin:0 0 .55rem}
   .enrollment-form{display:flex;gap:.6rem;flex-wrap:wrap}
   .enrollment input{flex:1 1 190px;min-width:0;padding:.65rem .75rem;border:1px solid rgba(255,255,255,.55);font:inherit;color:var(--lam-onyx);background:var(--lam-parchment)}
   .enrollment .btn{background:var(--lam-parchment);border-color:var(--lam-parchment);color:var(--lam-sapphire)}
   .enrollment .btn:hover{background:var(--lam-sage);border-color:var(--lam-sage)}
-  .enrollment-status{display:block;margin-top:.65rem;font-size:.8125rem;color:rgba(255,255,255,.9)}
+  .enrollment-status{display:block;margin-top:.5rem;font-size:.75rem;color:rgba(255,255,255,.9)}
 
   /* sticky progress */
   .strip{position:sticky;top:0;z-index:20;background:var(--lam-parchment);border-bottom:var(--rule);padding:.6rem 0}
@@ -44,10 +44,10 @@
   .strip small{font-size:.75rem;color:#4F5B66;white-space:nowrap}
 
   /* sections */
-  main{padding:2.5rem 0 0}
-  .howto{background:var(--lam-clarity);padding:1.5rem 1.75rem;border-left:3px solid var(--lam-sapphire);margin-bottom:3rem}
-  .howto h3{font-size:1.0625rem;font-weight:700;margin-bottom:.5rem}
-  .howto p{margin:0 0 .5rem;font-size:.9375rem;max-width:74ch}
+  main{padding:1.5rem 0 0}
+  .howto{background:var(--lam-clarity);padding:.9rem 1rem;border-left:3px solid var(--lam-sapphire);margin-bottom:1.75rem}
+  .howto h3{font-size:.9375rem;font-weight:700;margin-bottom:.25rem}
+  .howto p{margin:0;font-size:.8125rem;max-width:82ch}
   .howto p:last-child{margin:0}
 
   .block{margin:0 0 3.25rem}
@@ -130,7 +130,7 @@
   .weak{margin:.6rem 0 0;font-size:.875rem}
   .weak span{display:inline-block;background:var(--lam-clarity);color:var(--lam-sapphire);font-weight:700;padding:.15rem .5rem;margin:.15rem .3rem .15rem 0;font-size:.8125rem}
 
-  footer{border-top:var(--rule);margin-top:3rem;padding:1.5rem 0 3rem}
+  footer{border-top:var(--rule);margin-top:1.5rem;padding:.75rem 0 1.25rem}
   footer p{font-size:.6875rem;color:#4F5B66;margin:0 0 .4rem;max-width:80ch}
   @media(max-width:640px){
     .opts{margin-left:0}
@@ -145,9 +145,9 @@
   <header class="hero">
     <div class="wrap">
       <img class="logo" src="LazardLogoBlack.svg" alt="Lazard">
-      <p class="kicker" style="margin:1.25rem 0 0">Internal Training &middot; Sales Team</p>
+      <p class="kicker" style="margin:.7rem 0 0">Internal Training &middot; Sales Team</p>
       <h1>Fixed Income Fluency</h1>
-      <p>Three video blocks, nine knowledge checks, one capstone. Prepared ahead of the launch of Lazard&rsquo;s three fixed income ETFs.</p>
+      <p>Three video blocks, nine knowledge checks, one final assessment.</p>
       <section class="enrollment" aria-labelledby="enrollment-title">
         <p id="enrollment-title"><b>Start your training</b> &mdash; enter your details to save your completion record.</p>
         <form class="enrollment-form" id="enrollment-form">
@@ -171,9 +171,8 @@
 
   <main class="wrap">
     <section class="howto">
-      <h3>How to Use This Session</h3>
-      <p>Work through each block in order: watch the video, then open the knowledge checks beneath it. Each check is scenario-based on purpose &mdash; the goal is not to recite definitions but to make the right call in a live conversation. Commit to an answer before you check it; the explanation appears either way.</p>
-      <p>Finish with the 15-question capstone. Score 12 or better and you are conversation-ready. Anything you miss points you back to a specific section.</p>
+      <h3>Session flow</h3>
+      <p>Watch each video, complete its checks, then finish the 15-question capstone. A score of 12 or better completes the training.</p>
     </section>
 
     <div id="blocks"></div>
@@ -194,9 +193,7 @@
   </section>
 
   <footer class="wrap">
-    <p><b>Internal use only.</b> Figures in worked examples are illustrative and rounded for teaching purposes. Any market data, yields, or performance references must be verified against current factsheets and approved by Compliance before use in client conversations or materials.</p>
-    <p>Answer options are presented in randomised order, so the letter of a correct answer will not match the printed answer key in Appendix B.</p>
-    <p><a href="admin.html" style="color:#4F5B66;text-decoration:none">Admin</a></p>
+    <a href="admin.html" style="color:#4F5B66;text-decoration:none;font-size:.6875rem">Admin</a>
   </footer>
 </div>
 
