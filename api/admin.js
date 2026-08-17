@@ -34,11 +34,11 @@ module.exports = async (req, res) => {
 
   try {
     const dbResponse = await supabase(
-      "training_records?select=full_name,email,completed_at,latest_capstone_score,updated_at&completed_at=not.is.null&order=completed_at.desc"
+      "training_records?select=full_name,email,created_at,updated_at,completed_at,completed_videos,completed_checks,latest_capstone_score&order=updated_at.desc"
     );
     if (!dbResponse.ok) throw new Error(await dbResponse.text());
-    const completions = await dbResponse.json();
-    return response(res, 200, { completions });
+    const learners = await dbResponse.json();
+    return response(res, 200, { learners });
   } catch (error) {
     console.error("Admin API error", error);
     return response(res, 500, { error: "Unable to load completions." });

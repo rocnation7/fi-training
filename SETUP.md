@@ -9,4 +9,4 @@
 
 The site registers a learner by name and email. It records video/check progress and marks `completed_at` only when the server independently scores a submitted capstone at 12 or more out of 15. When a learner enters a previously registered email, their saved videos, knowledge checks, and latest capstone result are restored from Supabase. Query `training_records` in Supabase to see completions; `training_attempts` keeps each scored submission.
 
-Open `/admin.html` and enter `ADMIN_PASSWORD` to view completed learners, their capstone scores, and completion dates. The page itself contains no learner data; it receives records only from the password-protected `/api/admin` endpoint.
+Open `/admin.html` and enter `ADMIN_PASSWORD` to view all registered learners, their current video/check progress, capstone score, and completion status. The page can export this register as an Excel-friendly CSV. It contains no learner data until the password-protected `/api/admin` endpoint responds.
