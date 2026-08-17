@@ -906,6 +906,23 @@
   }
 
   function learnerReady(){ return !!(state.learner && state.learner.id); }
+  function restoreProgress(learner){
+    var progress = learner.progress || {};
+    var answers = progress.capstoneAnswers || {};
+    state = {
+      answers: progress.knowledgeCheckAnswers || {},
+      revealed: (progress.completedChecks || []).reduce(function(out, id){ out[id] = true; return out; }, {}),
+      order: {},
+      videos: (progress.completedVideos || []).reduce(function(out, id){ out[id] = true; return out; }, {}),
+      learner: { id: learner.id, fullName: learner.fullName, email: learner.email },
+      capstone: {
+        answers: answers,
+        submitted: !!progress.capstoneSubmitted,
+        attempts: Number(progress.capstoneAttempts) || 0,
+        best: progress.capstoneBest === null || progress.capstoneBest === undefined ? null : Number(progress.capstoneBest)
+      }
+    };
+  }
   function isBlockComplete(block){ return block.checks.every(function(c){ return !!state.revealed[c.id]; }); }
   function isBlockUnlocked(blockIndex){
     return blockIndex === 0 || isBlockComplete(DATA.blocks[blockIndex - 1]);
@@ -927,6 +944,7 @@
         learnerId: state.learner.id,
         completedChecks: completedChecks,
         completedVideos: Object.keys(state.videos).filter(function(id){ return state.videos[id]; }),
+        knowledgeCheckAnswers: state.answers,
         capstoneAnswers: includeAnswers ? state.capstone.answers : null
       })
     }).then(function(r){
@@ -1160,10 +1178,10 @@
       if(!r.ok) throw new Error("Unable to register.");
       return r.json();
     }).then(function(learner){
-      state.learner = learner;
+      restoreProgress(learner);
       store.save();
       form.hidden = true;
-      status.textContent = "Welcome, " + learner.fullName + ". Your progress is being recorded.";
+      status.textContent = "Welcome, " + learner.fullName + ". Your saved progress has been restored.";
       renderBlocks(); renderCapstone(); updateProgress();
     }).catch(function(){
       status.textContent = "We could not save your details. Please try again.";
