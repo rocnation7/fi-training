@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Training Completion Register</title>
+<style>
+  :root{--blue:#00539A;--ink:#171A1C;--paper:#fff;--fog:#f5f5f5;--sage:#eef3e8;--line:#cbd2d8;--green:#51744e;--muted:#4f5b66;--display:"Cormorant Garamond",Georgia,serif;--body:"Helvetica Neue",Helvetica,sans-serif}
+  *{box-sizing:border-box} body{margin:0;background:var(--fog);color:var(--ink);font-family:var(--body);line-height:1.45}.shell{max-width:1100px;margin:0 auto;padding:2rem 1.25rem 4rem}.mast{border-top:7px solid var(--blue);padding:1.5rem 0 2.75rem}.eyebrow{margin:0 0 .55rem;font-size:.72rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--blue)}h1{font:300 clamp(2.7rem,7vw,5rem)/.9 var(--display);letter-spacing:-.035em;margin:0;max-width:11ch}.sub{max-width:52ch;margin:1rem 0 0;color:var(--muted)}.card{background:var(--paper);border:1px solid var(--line);box-shadow:0 18px 45px rgba(23,26,28,.07)}.login{max-width:490px;padding:1.7rem}.login h2{font-size:1.1rem;margin:0 0 .25rem}.login p{font-size:.9rem;color:var(--muted);margin:.25rem 0 1.25rem}label{display:block;font-weight:700;font-size:.82rem;margin-bottom:.4rem}input{display:block;width:100%;font:inherit;padding:.78rem .85rem;border:1px solid #98a5ad;background:#fff}button{border:1px solid var(--blue);padding:.74rem 1.05rem;color:#fff;background:var(--blue);font:700 .85rem var(--body);cursor:pointer}button:hover{background:#00447f}button.ghost{background:transparent;color:var(--blue)}.actions{display:flex;gap:.65rem;align-items:center;margin-top:1rem;flex-wrap:wrap}.notice{min-height:1.25rem;margin:.8rem 0 0;font-size:.85rem;color:#b33c23}.dashboard{display:none}.summary{display:flex;justify-content:space-between;gap:1rem;align-items:end;padding:1.5rem 1.5rem 1.2rem;border-bottom:1px solid var(--line);flex-wrap:wrap}.summary h2{font:300 2.15rem/.95 var(--display);margin:0}.count{margin:.45rem 0 0;color:var(--muted);font-size:.88rem}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:680px}th{text-align:left;background:var(--sage);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:.8rem 1.5rem;color:#435040}td{padding:1rem 1.5rem;border-top:1px solid #e2e6e8;font-size:.9rem}td.score{font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}.empty{padding:2.5rem 1.5rem;color:var(--muted)}.last{font-size:.78rem;color:var(--muted);margin:1rem 0 0}@media(max-width:640px){.shell{padding-top:1.25rem}.mast{padding-bottom:2rem}.summary{padding:1.2rem}.login{padding:1.25rem}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="mast"><p class="eyebrow">Fixed Income Fluency</p><h1>Completion Register</h1><p class="sub">A private view of learners who have passed the final assessment and completed the training.</p></header>
+  <section class="card login" id="login-card" aria-labelledby="login-title">
+    <h2 id="login-title">Admin access</h2><p>Enter the administrator password to load the completion record.</p>
+    <form id="login-form"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required><div class="actions"><button type="submit">View completions</button></div><p class="notice" id="notice" role="alert"></p></form>
+  </section>
+  <section class="card dashboard" id="dashboard" aria-labelledby="dashboard-title">
+    <div class="summary"><div><p class="eyebrow">Completed learners</p><h2 id="dashboard-title">Training completion</h2><p class="count" id="count">Loading…</p></div><button class="ghost" id="refresh" type="button">Refresh</button></div>
+    <div class="table-wrap"><table><thead><tr><th>Learner</th><th>Email</th><th>Capstone</th><th>Completed</th><th>Last updated</th></tr></thead><tbody id="rows"></tbody></table></div>
+  </section>
+  <p class="last" id="last"></p>
+</main>
+<script>
+(function(){
+  var password = "";
+  var form = document.getElementById("login-form");
+  var notice = document.getElementById("notice");
+  var dashboard = document.getElementById("dashboard");
+  var rows = document.getElementById("rows");
+  function date(value){ return value ? new Date(value).toLocaleString() : "—"; }
+  function cell(row, text, className){ var td = document.createElement("td"); td.textContent = text; if(className) td.className = className; row.appendChild(td); }
+  function load(){
+    notice.textContent = "";
+    return fetch("/api/admin", { headers:{ "X-Admin-Password": password } }).then(function(response){
+      return response.json().then(function(body){ if(!response.ok) throw new Error(body.error || "Unable to load completions."); return body; });
+    }).then(function(body){
+      rows.innerHTML = "";
+      if(!body.completions.length){ var empty = document.createElement("tr"); var td = document.createElement("td"); td.colSpan = 5; td.className = "empty"; td.textContent = "No learners have completed the training yet."; empty.appendChild(td); rows.appendChild(empty); }
+      body.completions.forEach(function(learner){ var row = document.createElement("tr"); cell(row, learner.full_name); cell(row, learner.email); cell(row, learner.latest_capstone_score + " / 15", "score"); cell(row, date(learner.completed_at)); cell(row, date(learner.updated_at)); rows.appendChild(row); });
+      document.getElementById("count").textContent = body.completions.length + (body.completions.length === 1 ? " learner has completed training" : " learners have completed training");
+      document.getElementById("last").textContent = "Last refreshed " + new Date().toLocaleTimeString();
+      document.getElementById("login-card").style.display = "none"; dashboard.style.display = "block";
+    }).catch(function(error){ notice.textContent = error.message; });
+  }
+  form.addEventListener("submit", function(event){ event.preventDefault(); password = document.getElementById("password").value; load(); });
+  document.getElementById("refresh").addEventListener("click", load);
+})();
+</script>
+</body>
+</html>
