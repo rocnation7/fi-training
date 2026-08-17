@@ -25,6 +25,26 @@ function scoreAnswers(answers) {
   return ANSWER_KEY.reduce((score, answer, index) => score + (Number(answers[`c${index + 1}`]) === answer ? 1 : 0), 0);
 }
 
+async function learnerProgress(record) {
+  const attemptsResponse = await supabase(
+    `training_attempts?training_record_id=eq.${encodeURIComponent(record.id)}&select=score`,
+    { method: "GET" }
+  );
+  if (!attemptsResponse.ok) throw new Error(await attemptsResponse.text());
+  const attempts = await attemptsResponse.json();
+  const scores = attempts.map((attempt) => attempt.score);
+
+  return {
+    completedChecks: Array.isArray(record.completed_checks) ? record.completed_checks : [],
+    completedVideos: Array.isArray(record.completed_videos) ? record.completed_videos : [],
+    knowledgeCheckAnswers: record.knowledge_check_answers || {},
+    capstoneAnswers: record.capstone_answers || {},
+    capstoneSubmitted: record.latest_capstone_score !== null,
+    capstoneAttempts: scores.length,
+    capstoneBest: scores.length ? Math.max(...scores) : null
+  };
+}
+
 module.exports = async (req, res) => {
   if (req.method !== "POST" && req.method !== "PATCH") return response(res, 405, { error: "Method not allowed." });
 
@@ -41,16 +61,29 @@ module.exports = async (req, res) => {
       });
       if (!dbResponse.ok) throw new Error(await dbResponse.text());
       const [record] = await dbResponse.json();
-      return response(res, 200, { id: record.id, fullName: record.full_name, email: record.email });
+      return response(res, 200, {
+        id: record.id,
+        fullName: record.full_name,
+        email: record.email,
+        progress: await learnerProgress(record)
+      });
     }
 
     const learnerId = String(req.body && req.body.learnerId || "");
     if (!learnerId) return response(res, 400, { error: "Learner ID is required." });
     const completedChecks = Array.isArray(req.body.completedChecks) ? req.body.completedChecks : [];
     const completedVideos = Array.isArray(req.body.completedVideos) ? req.body.completedVideos : [];
+    const knowledgeCheckAnswers = req.body.knowledgeCheckAnswers && typeof req.body.knowledgeCheckAnswers === "object"
+      ? req.body.knowledgeCheckAnswers
+      : {};
     const answers = req.body.capstoneAnswers;
     const score = scoreAnswers(answers);
-    const update = { completed_checks: completedChecks, completed_videos: completedVideos, updated_at: new Date().toISOString() };
+    const update = {
+      completed_checks: completedChecks,
+      completed_videos: completedVideos,
+      knowledge_check_answers: knowledgeCheckAnswers,
+      updated_at: new Date().toISOString()
+    };
     if (score !== null) {
       update.latest_capstone_score = score;
       update.capstone_answers = answers;
