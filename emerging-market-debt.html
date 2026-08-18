@@ -578,7 +578,7 @@
     if(!window.LamAcademy) return;
     var completedChecks = [];
     DATA.blocks.forEach(function(b){ b.checks.forEach(function(c){ if(state.revealed[c.id]) completedChecks.push(c.id); }); });
-    window.LamAcademy.updateCourse("emerging-market-debt", { completedChecks: completedChecks, capstoneScore: state.capstone.submitted ? capstoneScore() : null, completed: state.capstone.submitted && capstoneScore() >= CONFIG.PASS_MARK });
+    window.LamAcademy.updateCourse(COURSE_ID, { completedVideos: videoComplete() ? [COURSE_ID] : [], completedChecks: completedChecks, knowledgeCheckAnswers: state.answers, capstoneAnswers: state.capstone.answers, capstoneSubmitted: state.capstone.submitted, capstoneAttempts: state.capstone.attempts, capstoneBest: state.capstone.best, capstoneScore: state.capstone.submitted ? capstoneScore() : null, completed: state.capstone.submitted && capstoneScore() >= CONFIG.PASS_MARK });
   }
   function displayOrder(q){
     if(state.order[q.id]) return state.order[q.id];
@@ -885,6 +885,7 @@
       if(snote) snote.textContent = answered + " of " + DATA.capstone.length + " answered \u00b7 pass mark " + CONFIG.PASS_MARK;
     }
     store.save();
+    syncAcademyCourse();
   });
 
   document.addEventListener("click", function(e){
@@ -900,7 +901,7 @@
       if(c2){
         delete state.revealed[c2.id];
         c2.questions.forEach(function(q){ delete state.answers[q.id]; delete state.order[q.id]; });
-        renderBlocks(); renderCapstone(); store.save();
+        renderBlocks(); renderCapstone(); store.save(); syncAcademyCourse();
       }
       return;
     }
@@ -921,6 +922,7 @@
       DATA.capstone.forEach(function(q){ delete state.order[q.id]; });
       renderCapstone();
       store.save();
+      syncAcademyCourse();
       return;
     }
     if(t.id === "reset-all"){
@@ -939,6 +941,21 @@
   }, true);
 
   /* ---- Boot ----------------------------------------------------------- */
+  function restoreAcademyProgress(){
+    var learner = window.LamAcademy && window.LamAcademy.session();
+    if(!learner) return;
+    var progress = learner.courseProgress && learner.courseProgress[COURSE_ID];
+    if(!progress) return;
+    state.answers = progress.knowledgeCheckAnswers || {};
+    state.revealed = (progress.completedChecks || []).reduce(function(out, id){ out[id] = true; return out; }, {});
+    state.capstone = { answers: progress.capstoneAnswers || {}, submitted: !!progress.capstoneSubmitted, attempts: Number(progress.capstoneAttempts) || 0, best: progress.capstoneBest === null || progress.capstoneBest === undefined ? null : Number(progress.capstoneBest) };
+    if((progress.completedVideos || []).indexOf(COURSE_ID) !== -1){ try { window.localStorage.setItem("lam-fi-video-complete:" + COURSE_ID + ":v1", "true"); } catch(e) {} }
+  }
+  window.addEventListener("lamacademyready", function(){
+    restoreAcademyProgress();
+    store.save();
+    renderBlocks(); renderCapstone(); updateProgress();
+  });
   function boot(saved){
     if(saved && saved.answers){
       state.answers = saved.answers || {};
@@ -946,6 +963,7 @@
       state.order = saved.order || {};
       state.capstone = saved.capstone || state.capstone;
     }
+    restoreAcademyProgress();
     renderBlocks();
     renderCapstone();
     updateProgress();
