@@ -40,9 +40,8 @@
           .then(function(response){ if(!response.ok) return response.json().then(function(body){ throw new Error(body.error || "Unable to sign in."); }); return response.json(); })
           .then(function(learner){
             window.LamAcademy.saveSession(learner);
-            var requested = new URLSearchParams(window.location.search).get("next");
-            if(requested) window.location.assign(window.LamAcademy.destination(requested));
-            else { unlock(learner); button.disabled = false; }
+            unlock(learner);
+            button.disabled = false;
           })
           .catch(function(error){ status.textContent = error.message; button.disabled = false; });
       });

@@ -43,6 +43,6 @@
   window.LamAcademy = { session: session, saveSession: saveSession, destination: destination, updateCourse: updateCourse };
   var current = document.currentScript;
   var course = current && current.dataset.course;
-  if (course && !session()) { window.location.replace("index.html?next=" + encodeURIComponent(window.location.pathname.split("/").pop())); return; }
+  if (course && !session()) { window.location.replace("index.html"); return; }
   if (course) document.addEventListener("DOMContentLoaded", function () { applyVideoGate(course); });
 })();
