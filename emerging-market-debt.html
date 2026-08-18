@@ -1,0 +1,942 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --lam-sapphire:#00539A; --lam-parchment:#FFFFFF; --lam-onyx:#171A1C;
+    --lam-ink-blue:#23283C; --lam-clarity:#EBF4FA; --lam-moss:#495A4A;
+    --lam-sage:#EEF3E8; --lam-light-grey:#F5F5F5; --lam-highlight-grey:#CBD2D8;
+    --lam-data-red:#BC4124; --lam-data-dark-green:#51744E;
+    --font-display:"VC Garamond Condensed","Cormorant Garamond","EB Garamond",Georgia,serif;
+    --font-body:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --rule:1px solid rgba(23,26,28,.14);
+  }
+  *{box-sizing:border-box}
+  .fi{font-family:var(--font-body);color:var(--lam-onyx);background:var(--lam-parchment);line-height:1.5;font-size:16px}
+  .fi h1,.fi h2{font-family:var(--font-display);font-weight:300;letter-spacing:-.02em;line-height:.98;margin:0}
+  .fi h3,.fi h4{font-family:var(--font-body);margin:0;line-height:1.25;letter-spacing:0}
+  .wrap{width:min(940px,calc(100% - 2.5rem));margin:0 auto}
+  .kicker{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+
+  /* hero */
+  .hero{background:var(--lam-sapphire);color:var(--lam-parchment);padding:2.75rem 0 2.25rem}
+  .logo-ph{display:inline-block;border:1px dashed rgba(255,255,255,.55);padding:.4rem .6rem;font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.85)}
+  .hero h1{font-size:clamp(2.75rem,6vw,4.5rem);color:var(--lam-sage);margin:1.5rem 0 .5rem}
+  .hero p{margin:0;max-width:52ch;color:rgba(255,255,255,.92)}
+  .hero .kicker{color:rgba(255,255,255,.75)}
+
+  /* sticky progress */
+  .strip{position:sticky;top:0;z-index:20;background:var(--lam-parchment);border-bottom:var(--rule);padding:.6rem 0}
+  .strip-in{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+  .bar{flex:1 1 180px;height:4px;background:var(--lam-highlight-grey);position:relative;min-width:120px}
+  .bar span{position:absolute;inset:0 auto 0 0;background:var(--lam-sapphire);width:0;transition:width .3s}
+  .strip small{font-size:.75rem;color:#4F5B66;white-space:nowrap}
+
+  /* sections */
+  main{padding:2.5rem 0 0}
+  .howto{background:var(--lam-clarity);padding:1.5rem 1.75rem;border-left:3px solid var(--lam-sapphire);margin-bottom:3rem}
+  .howto h3{font-size:1.0625rem;font-weight:700;margin-bottom:.5rem}
+  .howto p{margin:0 0 .5rem;font-size:.9375rem;max-width:74ch}
+  .howto p:last-child{margin:0}
+
+  .block{margin:0 0 3.25rem}
+  .block-head{border-top:2px solid var(--lam-onyx);padding-top:1rem;margin-bottom:1.5rem}
+  .block-head .meta{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+  .block-head .kicker{color:var(--lam-sapphire)}
+  .block-head h2{font-size:clamp(2rem,3.6vw,2.875rem);margin:.35rem 0 .25rem}
+  .block-head .sub{font-size:.9375rem;color:#4F5B66;margin:0}
+  .time{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4F5B66;white-space:nowrap}
+
+  /* video slot */
+  .video{margin:0 0 1.5rem}
+  .video-slot{aspect-ratio:16/9;background:var(--lam-ink-blue);color:rgba(255,255,255,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;text-align:center;padding:1rem}
+  .video-slot .kicker{color:rgba(255,255,255,.6)}
+  .video-slot b{font-family:var(--font-display);font-size:1.75rem;font-weight:300;color:var(--lam-sage)}
+  .video-cap{font-size:.75rem;color:#4F5B66;margin:.5rem 0 0}
+
+  /* accordion */
+  .checks{border-top:var(--rule)}
+  details.check{border-bottom:var(--rule)}
+  details.check>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.75rem;padding:1rem .25rem}
+  details.check>summary::-webkit-details-marker{display:none}
+  .chev{flex:0 0 auto;width:11px;height:11px;border-right:2px solid var(--lam-sapphire);border-bottom:2px solid var(--lam-sapphire);transform:rotate(45deg);transition:transform .2s;margin-right:.15rem}
+  details[open]>summary .chev{transform:rotate(-135deg)}
+  .ck-title{flex:1 1 auto;font-weight:700;font-size:1rem}
+  .ck-title em{font-style:normal;font-weight:400;color:#4F5B66}
+  .pill{flex:0 0 auto;font-size:.6875rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.3rem .55rem;border:1px solid var(--lam-highlight-grey);color:#4F5B66;background:var(--lam-light-grey)}
+  .pill.done{background:var(--lam-sage);border-color:#c9d8bd;color:var(--lam-data-dark-green)}
+  .pill.part{background:var(--lam-clarity);border-color:#c5dcee;color:var(--lam-sapphire)}
+  .ck-body{padding:.25rem .25rem 1.75rem}
+
+  /* questions */
+  .q{padding:1.25rem 0;border-top:1px dashed rgba(23,26,28,.14)}
+  .q:first-child{border-top:none;padding-top:.25rem}
+  .q-stem{display:flex;gap:.7rem;margin-bottom:.85rem}
+  .q-num{flex:0 0 auto;font-weight:700;color:var(--lam-sapphire);font-variant-numeric:tabular-nums}
+  .q-stem p{margin:0;font-size:.9375rem;max-width:76ch}
+  .opts{display:grid;gap:.4rem;margin:0 0 0 1.9rem}
+  .opt{display:flex;gap:.65rem;align-items:flex-start;padding:.6rem .75rem;border:1px solid var(--lam-highlight-grey);cursor:pointer;font-size:.9375rem;background:var(--lam-parchment);transition:background .15s,border-color .15s}
+  .opt:hover{background:var(--lam-light-grey)}
+  .opt input{margin:.25rem 0 0;accent-color:var(--lam-sapphire);flex:0 0 auto}
+  .opt .ltr{flex:0 0 auto;font-weight:700;color:#4F5B66}
+  .opt.sel{border-color:var(--lam-sapphire);background:var(--lam-clarity)}
+  .locked .opt{cursor:default}
+  .locked .opt:hover{background:var(--lam-parchment)}
+  .locked .opt.sel{background:var(--lam-clarity)}
+  .opt.right{border-color:var(--lam-data-dark-green);background:var(--lam-sage)}
+  .opt.wrong{border-color:var(--lam-data-red);background:#fbf0ed}
+  .fb{margin:.75rem 0 0 1.9rem;padding:.75rem .9rem;font-size:.875rem;border-left:3px solid var(--lam-highlight-grey);background:var(--lam-light-grey);max-width:76ch}
+  .fb.right{border-left-color:var(--lam-data-dark-green)}
+  .fb.wrong{border-left-color:var(--lam-data-red)}
+  .fb b{display:block;margin-bottom:.2rem}
+  .fb .ref{display:block;margin-top:.35rem;color:#4F5B66;font-size:.8125rem}
+
+  /* actions */
+  .actions{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;margin-top:1.5rem}
+  .btn{font-family:var(--font-body);font-size:.875rem;font-weight:700;letter-spacing:.02em;padding:.75rem 1.35rem;border:1px solid var(--lam-sapphire);background:var(--lam-sapphire);color:var(--lam-parchment);cursor:pointer}
+  .btn:hover{background:#00447f;border-color:#00447f}
+  .btn[disabled]{opacity:.4;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--lam-sapphire)}
+  .btn.ghost:hover{background:var(--lam-clarity)}
+  .score{font-size:.875rem;font-weight:700}
+  .score.pass{color:var(--lam-data-dark-green)}
+  .score.fail{color:var(--lam-data-red)}
+  .note{font-size:.8125rem;color:#4F5B66}
+
+  /* capstone */
+  .capstone{background:var(--lam-onyx);color:var(--lam-parchment);padding:2.5rem 0 3rem;margin-top:1rem}
+  .capstone h2{color:var(--lam-sage);font-size:clamp(2.25rem,4.5vw,3.5rem);margin:.35rem 0 .5rem}
+  .capstone .kicker{color:rgba(255,255,255,.6)}
+  .capstone .sub{color:rgba(255,255,255,.85);font-size:.9375rem;margin:0;max-width:60ch}
+  .cap-card{background:var(--lam-parchment);color:var(--lam-onyx);padding:1.75rem;margin-top:1.75rem}
+  .gate{background:var(--lam-clarity);border-left:3px solid var(--lam-sapphire);padding:.9rem 1rem;font-size:.875rem;margin-bottom:1.5rem}
+  .result{border:1px solid var(--lam-highlight-grey);padding:1.5rem;margin-bottom:1.75rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}
+  .result .big{font-family:var(--font-display);font-size:3.5rem;line-height:1;font-weight:300}
+  .result.pass .big{color:var(--lam-data-dark-green)}
+  .result.fail .big{color:var(--lam-data-red)}
+  .result .verdict{font-weight:700;font-size:1.0625rem;margin:0 0 .3rem}
+  .result .rx{margin:0;font-size:.875rem;color:#4F5B66;max-width:56ch}
+  .weak{margin:.6rem 0 0;font-size:.875rem}
+  .weak span{display:inline-block;background:var(--lam-clarity);color:var(--lam-sapphire);font-weight:700;padding:.15rem .5rem;margin:.15rem .3rem .15rem 0;font-size:.8125rem}
+
+  footer{border-top:var(--rule);margin-top:3rem;padding:1.5rem 0 3rem}
+  footer p{font-size:.6875rem;color:#4F5B66;margin:0 0 .4rem;max-width:80ch}
+  @media(max-width:640px){
+    .opts{margin-left:0}
+    .fb{margin-left:0}
+    .q-stem{gap:.5rem}
+  }
+</style>
+
+<div class="fi">
+  <header class="hero">
+    <div class="wrap">
+      <div class="logo-ph">[LAM logo asset required here]</div>
+      <p class="kicker" style="margin:1.25rem 0 0">Internal Training &middot; Sales Team &middot; Fixed Income 201.2</p>
+      <h1>Emerging Market Debt</h1>
+      <p>One video, four knowledge checks, one capstone. A sector deep-dive building on Fixed Income 101, prepared ahead of the launch of Lazard&rsquo;s three fixed income ETFs.</p>
+    </div>
+  </header>
+
+  <div class="strip">
+    <div class="wrap strip-in">
+      <small id="p-label">Knowledge checks: 0 of 4 complete</small>
+      <div class="bar"><span id="p-bar"></span></div>
+      <small id="p-cap">Capstone: not attempted</small>
+      <button class="btn ghost" id="reset-all" style="padding:.4rem .7rem;font-size:.75rem">Reset</button>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="howto">
+      <h3>How to Use This Session</h3>
+      <p>Watch the video first, then open the knowledge checks beneath it. Each check is scenario-based on purpose &mdash; the goal is not to recite definitions but to make the right call in a live conversation. Commit to an answer before you check it; the explanation appears either way.</p>
+      <p>Finish with the 10-question capstone. Score 8 or better and you are conversation-ready. Anything you miss points you back to a specific section of the module.</p>
+    </section>
+
+    <div id="blocks"></div>
+  </main>
+
+  <section class="capstone">
+    <div class="wrap">
+      <p class="kicker">Capstone &middot; 8 Minutes</p>
+      <h2>Final Assessment</h2>
+      <p class="sub">10 questions across all five sections of the module. Target: 8 correct. Answers are withheld until you submit.</p>
+      <div class="cap-card">
+        <div id="cap-gate"></div>
+        <div id="cap-result"></div>
+        <div id="cap-questions"></div>
+        <div class="actions" id="cap-actions"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <p><b>Internal use only.</b> Figures in worked examples are illustrative and rounded for teaching purposes. Any market data, yields, or performance references must be verified against current factsheets and approved by Compliance before use in client conversations or materials.</p>
+    <p>Answer options are presented in randomised order, so the letter of a correct answer will not match the printed answer key in Appendix B of the full Word module.</p>
+  </footer>
+</div>
+
+<script type="application/json" id="fi-data">
+{
+  "blocks": [
+    {
+      "id": "b1",
+      "label": "Fixed Income 201.2",
+      "title": "Emerging Market Debt",
+      "sub": "A sector deep-dive for the sales team &mdash; builds on Fixed Income 101",
+      "time": "55 min",
+      "video": {
+        "title": "Emerging Market Debt",
+        "runtime": "Video 1 of 1"
+      },
+      "checks": [
+        {
+          "id": "kc1",
+          "n": 1,
+          "sec": "2.1",
+          "title": "The Map",
+          "questions": [
+            {
+              "id": "1.1",
+              "stem": "A client asks the difference between hard currency and local currency EMD. The defining distinction is:",
+              "options": [
+                "Hard currency bonds have higher coupons by law",
+                "Denomination: external debt is issued in dollars (or euros); local debt is issued in the country&rsquo;s own currency &mdash; which adds currency risk and local-rate risk for a dollar investor",
+                "Hard currency bonds are issued by companies, local by governments",
+                "There is no difference"
+              ],
+              "answer": 1,
+              "why": "Denomination is the organizing distinction &mdash; it determines whether a dollar investor bears EM currency risk and whose rate cycle drives the bonds."
+            },
+            {
+              "id": "1.2",
+              "stem": "For a US-dollar investor, external (hard currency) sovereign EMD carries:",
+              "options": [
+                "Currency risk but no credit risk",
+                "Country credit risk, plus embedded US Treasury duration &mdash; but no EM currency risk",
+                "Only local interest-rate risk",
+                "No risk of any kind"
+              ],
+              "answer": 1,
+              "why": "No EM currency risk in dollar bonds &mdash; but they price as a spread over Treasuries, so US duration rides along."
+            },
+            {
+              "id": "1.3",
+              "stem": "The most accurate one-line description of corporate EMD risk:",
+              "options": [
+                "Pure currency risk",
+                "Identical to US corporate risk",
+                "Two credit analyses stacked &mdash; the company and its country &mdash; with the sovereign setting a ceiling over the company",
+                "Only commodity risk"
+              ],
+              "answer": 2,
+              "why": "Two stacked credits with the sovereign as the ceiling &mdash; the one-line version of Section 2.4."
+            },
+            {
+              "id": "1.4",
+              "stem": "The most defensible way to define an &lsquo;emerging&rsquo; country is:",
+              "options": [
+                "Any country outside North America and Western Europe",
+                "Any country with low stock-market liquidity",
+                "A country carrying elevated country risk &mdash; flagged by markers like sub-high-income wealth, a geopolitical threat, speculative-grade credit, or fragile political institutions",
+                "Any country with a freely floating currency"
+              ],
+              "answer": 2,
+              "why": "Elevated country risk is the defining criterion, not geography or liquidity. The four markers &mdash; sub-high-income wealth, geopolitical threat, speculative-grade credit, fragile institutions &mdash; are the checklist behind the label."
+            }
+          ]
+        },
+        {
+          "id": "kc2",
+          "n": 2,
+          "sec": "2.2",
+          "title": "External Debt",
+          "questions": [
+            {
+              "id": "2.1",
+              "stem": "The fundamental reason external sovereign debt carries default risk:",
+              "options": [
+                "EM governments are always insolvent",
+                "The borrower owes a currency it cannot print, so repayment depends on earning or holding dollars",
+                "Dollar bonds have no legal documentation",
+                "External bonds pay no coupons"
+              ],
+              "answer": 1,
+              "why": "A government can print its own currency, not dollars. That single fact creates the entire asset class&rsquo;s credit risk."
+            },
+            {
+              "id": "2.2",
+              "stem": "Sovereign credit analysis differs from corporate analysis chiefly because:",
+              "options": [
+                "Sovereigns publish no data",
+                "There is no bankruptcy court for countries &mdash; so willingness to pay, a political judgment, sits alongside ability to pay",
+                "Sovereigns cannot restructure debt",
+                "Ratings agencies do not rate sovereigns"
+              ],
+              "answer": 1,
+              "why": "No court compels a sovereign; willingness to pay is a political judgment layered on the balance-sheet work."
+            },
+            {
+              "id": "2.3",
+              "stem": "US Treasury yields rise sharply in a year when EM credit fundamentals are stable. External EMD most likely:",
+              "options": [
+                "Is unaffected &mdash; it has no US rate exposure",
+                "Declines &mdash; dollar-denominated bonds priced over Treasuries carry embedded US duration",
+                "Doubles in price",
+                "Converts to local currency"
+              ],
+              "answer": 1,
+              "why": "Spread-over-Treasuries pricing embeds US duration &mdash; external EMD can have a bad year on US rates alone."
+            }
+          ]
+        },
+        {
+          "id": "kc3",
+          "n": 3,
+          "sec": "2.3",
+          "title": "Local Currency",
+          "questions": [
+            {
+              "id": "3.1",
+              "stem": "Local EMD carries +6%, local rates add +2%, and the currency depreciates &minus;8% against the dollar. A US investor&rsquo;s total return is approximately:",
+              "options": [
+                "+8% &mdash; currency doesn&rsquo;t affect bond returns",
+                "0% (rounding) &mdash; the currency term offset the bond return",
+                "&minus;8%",
+                "+16%"
+              ],
+              "answer": 1,
+              "why": "+6 +2 &minus;8 &asymp; 0. The coupons all arrived; the translation took them away. The decomposition makes the swing legible."
+            },
+            {
+              "id": "3.2",
+              "stem": "The factor most often responsible for the difference between a strong and weak year in local EMD (for a USD investor) is:",
+              "options": [
+                "Coupon changes",
+                "The currency term &mdash; frequently the largest and most volatile of the four drivers",
+                "Index rebalancing",
+                "US corporate earnings"
+              ],
+              "answer": 1,
+              "why": "Currency is the widest-ranging of the four drivers &mdash; the honest headline of the asset class."
+            },
+            {
+              "id": "3.3",
+              "stem": "A client asks why the strategy doesn&rsquo;t hedge its currency exposure. The most accurate response:",
+              "options": [
+                "Hedging EM currencies is illegal",
+                "Hedging costs roughly the interest-rate differential &mdash; approximately the carry &mdash; so it removes the return source and the dollar diversification the allocation exists to provide; exposure is managed, not eliminated",
+                "The managers forgot",
+                "Currencies never move"
+              ],
+              "answer": 1,
+              "why": "Hedging costs the rate differential &asymp; the carry. Unhedged is a design choice, not an oversight; exposure is managed at the country level."
+            },
+            {
+              "id": "3.4",
+              "stem": "An EM central bank hikes early and decisively against inflation while its real yields turn strongly positive. The typical first-order currency effect:",
+              "options": [
+                "The currency weakens &mdash; hikes always hurt",
+                "Supportive &mdash; high credible real yields attract capital and pay investors to hold the currency",
+                "No effect &mdash; currencies ignore rates",
+                "The currency is repegged automatically"
+              ],
+              "answer": 1,
+              "why": "Credible positive real yields pay investors to hold the currency &mdash; the reward for orthodox EM central banking."
+            }
+          ]
+        },
+        {
+          "id": "kc4",
+          "n": 4,
+          "sec": "2.4",
+          "title": "Corporate EMD",
+          "questions": [
+            {
+              "id": "4.1",
+              "stem": "The &lsquo;sovereign ceiling&rsquo; refers to:",
+              "options": [
+                "The maximum coupon a government allows",
+                "The practice of capping most companies&rsquo; ratings at or near their sovereign&rsquo;s rating, because country-level transfer and macro risks bind even strong businesses",
+                "A limit on foreign ownership of bonds",
+                "The tallest building in the capital"
+              ],
+              "answer": 1,
+              "why": "Country risks bind even strong companies &mdash; hence the cap, with rare offshore-earnings exceptions worth finding."
+            },
+            {
+              "id": "4.2",
+              "stem": "A financially healthy EM exporter misses a dollar bond payment after its government imposes capital controls in a crisis. This illustrates:",
+              "options": [
+                "Fraud at the company",
+                "Transfer risk &mdash; country-level actions can block payment regardless of company fundamentals; the core reason corporate EMD is two credit analyses, not one",
+                "Currency appreciation risk",
+                "A rating agency error"
+              ],
+              "answer": 1,
+              "why": "Transfer risk in its classic form: the country blocked the payment, not the balance sheet."
+            },
+            {
+              "id": "4.3",
+              "stem": "Quasi-sovereign bonds typically offer:",
+              "options": [
+                "A contractual government guarantee in all cases",
+                "No yield at all",
+                "A spread pickup over their sovereign, priced on implicit &mdash; not contractual &mdash; state support that the analyst must judge",
+                "Immunity from default"
+              ],
+              "answer": 2,
+              "why": "Implicit support is an analytical judgment, and the spread pickup over the sovereign is the compensation for making it."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "capstone": [
+    {
+      "id": "c1",
+      "stem": "The defining difference between external and local currency EMD is:",
+      "options": [
+        "Coupon size",
+        "Denomination &mdash; external is issued in dollars/euros; local is issued in the issuer&rsquo;s own currency",
+        "Maturity length",
+        "Whether the bonds pay interest"
+      ],
+      "answer": 1,
+      "why": "Denomination organizes the whole asset class.",
+      "ref": "2.1"
+    },
+    {
+      "id": "c2",
+      "stem": "For a USD investor, the risk decomposition &lsquo;country risk plus currency risk plus local rate risk&rsquo; describes:",
+      "options": [
+        "External sovereign debt",
+        "Local currency sovereign debt",
+        "US Treasuries",
+        "Corporate hybrids"
+      ],
+      "answer": 1,
+      "why": "The three-part local decomposition &mdash; know it cold.",
+      "ref": "2.3"
+    },
+    {
+      "id": "c3",
+      "stem": "The risk decomposition &lsquo;country risk plus company-level credit risk&rsquo; describes:",
+      "options": [
+        "Local currency sovereigns",
+        "Corporate EMD",
+        "TIPS",
+        "Agency MBS"
+      ],
+      "answer": 1,
+      "why": "Corporate EMD = company plus country.",
+      "ref": "2.4"
+    },
+    {
+      "id": "c4",
+      "stem": "External sovereign debt carries genuine default risk fundamentally because:",
+      "options": [
+        "EM governments never collect taxes",
+        "The issuer owes a currency it cannot print",
+        "Dollar bonds have no coupons",
+        "The IMF forbids repayment"
+      ],
+      "answer": 1,
+      "why": "Can&rsquo;t print what you owe &mdash; the origin of sovereign credit risk.",
+      "ref": "2.2"
+    },
+    {
+      "id": "c5",
+      "stem": "Sovereign credit analysis adds a dimension corporate analysis lacks:",
+      "options": [
+        "Reading financial statements",
+        "Willingness to pay &mdash; a political judgment, since no bankruptcy court can compel a sovereign",
+        "Interest rate risk",
+        "Currency denomination"
+      ],
+      "answer": 1,
+      "why": "Willingness to pay has no corporate analogue.",
+      "ref": "2.2"
+    },
+    {
+      "id": "c6",
+      "stem": "Local EMD returns +6% carry and +3% from local rate moves, but the currency falls &minus;7%. Total return for a USD investor is approximately:",
+      "options": [
+        "+9%",
+        "+2%",
+        "&minus;7%",
+        "+16%"
+      ],
+      "answer": 1,
+      "why": "+6 +3 &minus;7 = +2. Decompose, don&rsquo;t dramatize.",
+      "ref": "2.3"
+    },
+    {
+      "id": "c7",
+      "stem": "The single most common reason a given year in local EMD is strongly positive or negative for a USD investor:",
+      "options": [
+        "Coupon resets",
+        "The currency term",
+        "Index fee changes",
+        "US equity earnings"
+      ],
+      "answer": 1,
+      "why": "The currency term decides most years.",
+      "ref": "2.3"
+    },
+    {
+      "id": "c8",
+      "stem": "Fully hedging a local currency EMD portfolio back to dollars primarily:",
+      "options": [
+        "Doubles the return",
+        "Costs roughly the rate differential &mdash; approximately the carry &mdash; removing the return source and the dollar diversification",
+        "Eliminates default risk",
+        "Is required by regulation"
+      ],
+      "answer": 1,
+      "why": "Hedge cost &asymp; carry; the unhedged design is deliberate.",
+      "ref": "2.3"
+    },
+    {
+      "id": "c9",
+      "stem": "The sovereign ceiling means:",
+      "options": [
+        "Governments cap corporate coupon rates",
+        "Most EM companies cannot be rated far above their own government, because country-level transfer and macro risks bind them",
+        "Sovereign bonds always yield more than corporates",
+        "Ratings are frozen for five years"
+      ],
+      "answer": 1,
+      "why": "The ceiling is the ratings expression of transfer risk.",
+      "ref": "2.4"
+    },
+    {
+      "id": "c10",
+      "stem": "A client fears dollar strength. The most professional framing of local EMD in that scenario:",
+      "options": [
+        "The dollar cannot strengthen",
+        "Dollar strength is a real headwind &mdash; symmetrical with the tailwind in dollar weakness; carry cushions it, and the allocation exists precisely to diversify dollar concentration, not as a one-way currency bet",
+        "The fund hedges everything at no cost",
+        "Currency effects average to zero every year"
+      ],
+      "answer": 1,
+      "why": "Risk-versus-risk framing, with carry as the cushion and portfolio role as the purpose &mdash; never a dollar forecast.",
+      "ref": "2.5"
+    }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- Configuration -------------------------------------------------- */
+  var CONFIG = {
+    REQUIRE_BLOCKS_BEFORE_CAPSTONE: false, /* set true to hard-lock the capstone */
+    SHUFFLE_OPTIONS: true,                 /* set false to keep the printed A-D order */
+    PASS_MARK: 8,
+    STORAGE_KEY: "fi-201-2-emd:v1"
+  };
+
+  var DATA = JSON.parse(document.getElementById("fi-data").textContent);
+  var LETTERS = ["A","B","C","D","E","F"];
+
+  /* ---- State ---------------------------------------------------------- */
+  var state = {
+    answers: {},            /* qid -> original option index */
+    revealed: {},           /* checkId -> true */
+    order: {},              /* qid -> array of original indices, display order */
+    capstone: { answers:{}, submitted:false, attempts:0, best:null }
+  };
+
+  /* Optional persistence. Degrades silently when window.storage is absent
+     (e.g. after export into an LMS or intranet page). */
+  var store = {
+    available: function(){ return typeof window !== "undefined" && window.storage && typeof window.storage.get === "function"; },
+    load: function(){
+      if(!this.available()) return Promise.resolve(null);
+      return window.storage.get(CONFIG.STORAGE_KEY)
+        .then(function(r){ return r && r.value ? JSON.parse(r.value) : null; })
+        .catch(function(){ return null; });
+    },
+    save: function(){
+      if(!this.available()) return;
+      try { window.storage.set(CONFIG.STORAGE_KEY, JSON.stringify(state)); } catch(e){}
+    },
+    clear: function(){
+      if(!this.available()) return;
+      try { window.storage.delete(CONFIG.STORAGE_KEY); } catch(e){}
+    }
+  };
+
+  /* ---- Helpers -------------------------------------------------------- */
+  function allQuestions(){
+    var out = [];
+    DATA.blocks.forEach(function(b){
+      b.checks.forEach(function(c){ c.questions.forEach(function(q){ out.push(q); }); });
+    });
+    return out;
+  }
+  function totalChecks(){
+    var n = 0;
+    DATA.blocks.forEach(function(b){ n += b.checks.length; });
+    return n;
+  }
+  function displayOrder(q){
+    if(state.order[q.id]) return state.order[q.id];
+    var idx = q.options.map(function(_,i){ return i; });
+    if(CONFIG.SHUFFLE_OPTIONS){
+      for(var i = idx.length - 1; i > 0; i--){
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = idx[i]; idx[i] = idx[j]; idx[j] = t;
+      }
+    }
+    state.order[q.id] = idx;
+    return idx;
+  }
+
+  /* ---- Rendering: knowledge checks ------------------------------------ */
+  function questionHTML(q, opts){
+    var group = opts.group;
+    var revealed = opts.revealed;
+    var chosen = opts.chosen;
+    var order = displayOrder(q);
+
+    var html = '<div class="q' + (revealed ? " locked" : "") + '" data-qid="' + q.id + '">';
+    html += '<div class="q-stem"><span class="q-num">' + opts.number + '</span><p>' + q.stem + '</p></div>';
+    html += '<div class="opts">';
+    order.forEach(function(origIdx, pos){
+      var cls = "opt";
+      if(chosen === origIdx) cls += " sel";
+      if(revealed){
+        if(origIdx === q.answer) cls += " right";
+        else if(chosen === origIdx) cls += " wrong";
+      }
+      html += '<label class="' + cls + '">'
+            +   '<input type="radio" name="' + group + "-" + q.id + '" value="' + origIdx + '"'
+            +     (chosen === origIdx ? " checked" : "") + (revealed ? " disabled" : "") + '>'
+            +   '<span class="ltr">' + LETTERS[pos] + '.</span>'
+            +   '<span>' + q.options[origIdx] + '</span>'
+            + '</label>';
+    });
+    html += '</div>';
+
+    if(revealed){
+      var right = chosen === q.answer;
+      html += '<div class="fb ' + (right ? "right" : "wrong") + '">'
+            +   '<b>' + (right ? "Correct" : (chosen === undefined ? "Not answered" : "Not quite")) + '</b>'
+            +   q.why
+            + (opts.ref ? '<span class="ref">Review section ' + opts.ref + '</span>' : "")
+            + '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function checkStatus(check){
+    var answered = check.questions.filter(function(q){ return state.answers[q.id] !== undefined; }).length;
+    var correct = check.questions.filter(function(q){ return state.answers[q.id] === q.answer; }).length;
+    return { answered: answered, correct: correct, total: check.questions.length, revealed: !!state.revealed[check.id] };
+  }
+
+  function renderBlocks(){
+    var host = document.getElementById("blocks");
+    var html = "";
+    DATA.blocks.forEach(function(b){
+      html += '<section class="block" id="' + b.id + '">';
+      html +=   '<div class="block-head"><div class="meta"><div>'
+            +     '<p class="kicker">' + b.label + '</p>'
+            +     '<h2>' + b.title + '</h2>'
+            +     '<p class="sub">' + b.sub + '</p>'
+            +   '</div><span class="time">' + b.time + '</span></div></div>';
+
+      /* Replace the .video-slot div below with your embed, e.g.
+         <iframe src="https://your-video-host/embed/BLOCK-ID" title="..." allowfullscreen
+                 style="width:100%;aspect-ratio:16/9;border:0"></iframe> */
+      html +=   '<div class="video"><div class="video-slot">'
+            +     '<p class="kicker">' + b.video.runtime + '</p>'
+            +     '<b>' + b.video.title + '</b>'
+            +     '<video controls preload="metadata" playsinline style="display:block;width:100%;aspect-ratio:16/9;background:#23283C"><source src="Emerging_Market_Debt.mp4" type="video/mp4">Your browser does not support HTML5 video.</video>'
+            +   '</div><p class="video-cap">Watch this block before opening the knowledge checks below.</p></div>';
+
+      html +=   '<div class="checks">';
+      b.checks.forEach(function(c){
+        var st = checkStatus(c);
+        var pillCls = st.revealed ? "pill done" : (st.answered ? "pill part" : "pill");
+        var pillTxt = st.revealed
+              ? st.correct + " of " + st.total + " correct"
+              : (st.answered ? st.answered + " of " + st.total + " answered" : "Not started");
+        html += '<details class="check" id="d-' + c.id + '"' + (st.answered && !st.revealed ? " open" : "") + '>'
+              +   '<summary><span class="chev"></span>'
+              +     '<span class="ck-title">Knowledge Check ' + c.n + ' &mdash; ' + c.title + ' <em>&middot; &sect;' + c.sec + '</em></span>'
+              +     '<span class="' + pillCls + '" data-pill="' + c.id + '">' + pillTxt + '</span>'
+              +   '</summary>'
+              +   '<div class="ck-body" data-body="' + c.id + '">' + checkBodyHTML(c) + '</div>'
+              + '</details>';
+      });
+      html +=   '</div>';
+      html += '</section>';
+    });
+    host.innerHTML = html;
+  }
+
+  function checkBodyHTML(c){
+    var st = checkStatus(c);
+    var html = "";
+    c.questions.forEach(function(q, i){
+      html += questionHTML(q, {
+        group: "kc",
+        number: c.n + "." + (i + 1),
+        revealed: st.revealed,
+        chosen: state.answers[q.id],
+        ref: st.revealed && state.answers[q.id] !== q.answer ? c.sec : null
+      });
+    });
+    html += '<div class="actions">';
+    if(st.revealed){
+      html += '<span class="score ' + (st.correct === st.total ? "pass" : "") + '">Score: ' + st.correct + " / " + st.total + '</span>'
+            + '<button class="btn ghost" data-retry="' + c.id + '">Clear and Try Again</button>';
+    } else {
+      html += '<button class="btn" data-submit="' + c.id + '"' + (st.answered === st.total ? "" : " disabled") + '>Check Answers</button>'
+            + '<span class="note">' + st.answered + " of " + st.total + ' answered</span>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function refreshCheck(c){
+    var body = document.querySelector('[data-body="' + c.id + '"]');
+    if(body) body.innerHTML = checkBodyHTML(c);
+    var st = checkStatus(c);
+    var pill = document.querySelector('[data-pill="' + c.id + '"]');
+    if(pill){
+      pill.className = st.revealed ? "pill done" : (st.answered ? "pill part" : "pill");
+      pill.textContent = st.revealed
+        ? st.correct + " of " + st.total + " correct"
+        : (st.answered ? st.answered + " of " + st.total + " answered" : "Not started");
+    }
+    updateProgress();
+  }
+
+  function findCheck(id){
+    var found = null;
+    DATA.blocks.forEach(function(b){
+      b.checks.forEach(function(c){ if(c.id === id) found = c; });
+    });
+    return found;
+  }
+
+  /* ---- Rendering: capstone -------------------------------------------- */
+  function checksComplete(){
+    var n = 0;
+    DATA.blocks.forEach(function(b){
+      b.checks.forEach(function(c){ if(state.revealed[c.id]) n++; });
+    });
+    return n;
+  }
+
+  function capstoneScore(){
+    return DATA.capstone.filter(function(q){ return state.capstone.answers[q.id] === q.answer; }).length;
+  }
+
+  function renderCapstone(){
+    var gate = document.getElementById("cap-gate");
+    var result = document.getElementById("cap-result");
+    var qHost = document.getElementById("cap-questions");
+    var actions = document.getElementById("cap-actions");
+    var done = checksComplete();
+    var locked = CONFIG.REQUIRE_BLOCKS_BEFORE_CAPSTONE && done < totalChecks();
+
+    gate.innerHTML = done < totalChecks()
+      ? '<div class="gate"><b>' + done + " of " + totalChecks() + ' knowledge checks complete.</b> '
+        + (locked ? "Finish all four before starting the capstone."
+                  : "You can start the capstone now, but the video and knowledge checks are the study material for it.")
+        + '</div>'
+      : "";
+
+    if(locked){
+      result.innerHTML = "";
+      qHost.innerHTML = "";
+      actions.innerHTML = "";
+      return;
+    }
+
+    /* Result panel */
+    if(state.capstone.submitted){
+      var sc = capstoneScore();
+      var pass = sc >= CONFIG.PASS_MARK;
+      var verdict, rx;
+      if(sc >= 8){ verdict = "Conversation-ready."; rx = "You can carry these frames into client and consultant meetings."; }
+      else if(sc >= 6){ verdict = "Solid."; rx = "Revisit the sections tied to your misses, listed beneath each question."; }
+      else { verdict = "More work needed."; rx = "Re-run Sections 2.1 and 2.3 of the module before client meetings &mdash; the three-market map and the four-driver decomposition carry this sector."; }
+
+      var misses = {};
+      DATA.capstone.forEach(function(q){
+        if(state.capstone.answers[q.id] !== q.answer) misses[q.ref] = (misses[q.ref] || 0) + 1;
+      });
+      var missKeys = Object.keys(misses).sort();
+
+      result.innerHTML = '<div class="result ' + (pass ? "pass" : "fail") + '">'
+        + '<div class="big">' + sc + '<span style="font-size:1.25rem;color:#4F5B66"> / ' + DATA.capstone.length + '</span></div>'
+        + '<div><p class="verdict">' + verdict + '</p><p class="rx">' + rx + '</p>'
+        + (missKeys.length ? '<p class="weak">Sections to revisit: ' + missKeys.map(function(k){ return '<span>&sect;' + k + '</span>'; }).join("") + '</p>' : "")
+        + '</div></div>';
+    } else {
+      result.innerHTML = "";
+    }
+
+    /* Questions */
+    var html = "";
+    DATA.capstone.forEach(function(q, i){
+      html += questionHTML(q, {
+        group: "cap",
+        number: String(i + 1),
+        revealed: state.capstone.submitted,
+        chosen: state.capstone.answers[q.id],
+        ref: state.capstone.submitted && state.capstone.answers[q.id] !== q.answer ? q.ref : null
+      });
+    });
+    qHost.innerHTML = html;
+
+    /* Actions */
+    var answered = Object.keys(state.capstone.answers).length;
+    if(state.capstone.submitted){
+      actions.innerHTML = '<button class="btn" id="cap-retake">Retake Capstone</button>'
+        + '<span class="note">Attempt ' + state.capstone.attempts
+        + (state.capstone.best !== null ? " &middot; best score " + state.capstone.best + " / " + DATA.capstone.length : "")
+        + '</span>';
+    } else {
+      actions.innerHTML = '<button class="btn" id="cap-submit"' + (answered === DATA.capstone.length ? "" : " disabled") + '>Submit and Score</button>'
+        + '<span class="note">' + answered + " of " + DATA.capstone.length + ' answered &middot; pass mark ' + CONFIG.PASS_MARK + '</span>';
+    }
+    updateProgress();
+  }
+
+  /* ---- Progress ------------------------------------------------------- */
+  function updateProgress(){
+    var done = checksComplete();
+    var tot = totalChecks();
+    document.getElementById("p-label").textContent = "Knowledge checks: " + done + " of " + tot + " complete";
+    document.getElementById("p-bar").style.width = (done / tot * 100) + "%";
+    var cap = document.getElementById("p-cap");
+    if(state.capstone.submitted){
+      var sc = capstoneScore();
+      cap.textContent = "Capstone: " + sc + " / " + DATA.capstone.length + (sc >= CONFIG.PASS_MARK ? " \u2014 passed" : "");
+    } else {
+      cap.textContent = "Capstone: not attempted";
+    }
+  }
+
+  /* ---- Events --------------------------------------------------------- */
+  document.addEventListener("change", function(e){
+    var input = e.target;
+    if(input.tagName !== "INPUT" || input.type !== "radio") return;
+    var name = input.name || "";
+    var qid = name.slice(name.indexOf("-") + 1);
+    var val = parseInt(input.value, 10);
+
+    if(name.indexOf("kc-") === 0){
+      state.answers[qid] = val;
+      var q = allQuestions().filter(function(x){ return x.id === qid; })[0];
+      var owner = null;
+      DATA.blocks.forEach(function(b){
+        b.checks.forEach(function(c){
+          if(c.questions.some(function(x){ return x.id === qid; })) owner = c;
+        });
+      });
+      /* Update selection styling and the submit button without a full re-render,
+         so radio focus is not lost mid-check. */
+      var wrapEl = input.closest(".q");
+      if(wrapEl){
+        wrapEl.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("sel"); });
+        input.closest(".opt").classList.add("sel");
+      }
+      if(owner){
+        var st = checkStatus(owner);
+        var body = document.querySelector('[data-body="' + owner.id + '"]');
+        var btn = body && body.querySelector("[data-submit]");
+        var note = body && body.querySelector(".note");
+        if(btn) btn.disabled = st.answered !== st.total;
+        if(note) note.textContent = st.answered + " of " + st.total + " answered";
+        var pill = document.querySelector('[data-pill="' + owner.id + '"]');
+        if(pill && !st.revealed){
+          pill.className = "pill part";
+          pill.textContent = st.answered + " of " + st.total + " answered";
+        }
+      }
+    } else if(name.indexOf("cap-") === 0){
+      state.capstone.answers[qid] = val;
+      var wrap2 = input.closest(".q");
+      if(wrap2){
+        wrap2.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("sel"); });
+        input.closest(".opt").classList.add("sel");
+      }
+      var answered = Object.keys(state.capstone.answers).length;
+      var sbtn = document.getElementById("cap-submit");
+      if(sbtn) sbtn.disabled = answered !== DATA.capstone.length;
+      var snote = document.querySelector("#cap-actions .note");
+      if(snote) snote.textContent = answered + " of " + DATA.capstone.length + " answered \u00b7 pass mark " + CONFIG.PASS_MARK;
+    }
+    store.save();
+  });
+
+  document.addEventListener("click", function(e){
+    var t = e.target;
+
+    if(t.dataset && t.dataset.submit){
+      var c = findCheck(t.dataset.submit);
+      if(c){ state.revealed[c.id] = true; refreshCheck(c); renderCapstone(); store.save(); }
+      return;
+    }
+    if(t.dataset && t.dataset.retry){
+      var c2 = findCheck(t.dataset.retry);
+      if(c2){
+        delete state.revealed[c2.id];
+        c2.questions.forEach(function(q){ delete state.answers[q.id]; delete state.order[q.id]; });
+        refreshCheck(c2); renderCapstone(); store.save();
+      }
+      return;
+    }
+    if(t.id === "cap-submit"){
+      state.capstone.submitted = true;
+      state.capstone.attempts += 1;
+      var sc = capstoneScore();
+      state.capstone.best = state.capstone.best === null ? sc : Math.max(state.capstone.best, sc);
+      renderCapstone();
+      store.save();
+      document.getElementById("cap-result").scrollIntoView({ behavior:"smooth", block:"center" });
+      return;
+    }
+    if(t.id === "cap-retake"){
+      state.capstone.submitted = false;
+      state.capstone.answers = {};
+      DATA.capstone.forEach(function(q){ delete state.order[q.id]; });
+      renderCapstone();
+      store.save();
+      return;
+    }
+    if(t.id === "reset-all"){
+      state = { answers:{}, revealed:{}, order:{}, capstone:{ answers:{}, submitted:false, attempts:0, best:null } };
+      store.clear();
+      renderBlocks(); renderCapstone(); updateProgress();
+      return;
+    }
+  });
+
+  /* ---- Boot ----------------------------------------------------------- */
+  function boot(saved){
+    if(saved && saved.answers){
+      state.answers = saved.answers || {};
+      state.revealed = saved.revealed || {};
+      state.order = saved.order || {};
+      state.capstone = saved.capstone || state.capstone;
+    }
+    renderBlocks();
+    renderCapstone();
+    updateProgress();
+  }
+
+  store.load().then(boot).catch(function(){ boot(null); });
+})();
+</script>

@@ -1,0 +1,930 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --lam-sapphire:#00539A; --lam-parchment:#FFFFFF; --lam-onyx:#171A1C;
+    --lam-ink-blue:#23283C; --lam-clarity:#EBF4FA; --lam-moss:#495A4A;
+    --lam-sage:#EEF3E8; --lam-light-grey:#F5F5F5; --lam-highlight-grey:#CBD2D8;
+    --lam-data-red:#BC4124; --lam-data-dark-green:#51744E;
+    --font-display:"VC Garamond Condensed","Cormorant Garamond","EB Garamond",Georgia,serif;
+    --font-body:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --rule:1px solid rgba(23,26,28,.14);
+  }
+  *{box-sizing:border-box}
+  .fi{font-family:var(--font-body);color:var(--lam-onyx);background:var(--lam-parchment);line-height:1.5;font-size:16px}
+  .fi h1,.fi h2{font-family:var(--font-display);font-weight:300;letter-spacing:-.02em;line-height:.98;margin:0}
+  .fi h3,.fi h4{font-family:var(--font-body);margin:0;line-height:1.25;letter-spacing:0}
+  .wrap{width:min(940px,calc(100% - 2.5rem));margin:0 auto}
+  .kicker{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+
+  /* hero */
+  .hero{background:var(--lam-sapphire);color:var(--lam-parchment);padding:2.75rem 0 2.25rem}
+  .logo-ph{display:inline-block;border:1px dashed rgba(255,255,255,.55);padding:.4rem .6rem;font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.85)}
+  .hero h1{font-size:clamp(2.75rem,6vw,4.5rem);color:var(--lam-sage);margin:1.5rem 0 .5rem}
+  .hero p{margin:0;max-width:52ch;color:rgba(255,255,255,.92)}
+  .hero .kicker{color:rgba(255,255,255,.75)}
+
+  /* sticky progress */
+  .strip{position:sticky;top:0;z-index:20;background:var(--lam-parchment);border-bottom:var(--rule);padding:.6rem 0}
+  .strip-in{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+  .bar{flex:1 1 180px;height:4px;background:var(--lam-highlight-grey);position:relative;min-width:120px}
+  .bar span{position:absolute;inset:0 auto 0 0;background:var(--lam-sapphire);width:0;transition:width .3s}
+  .strip small{font-size:.75rem;color:#4F5B66;white-space:nowrap}
+
+  /* sections */
+  main{padding:2.5rem 0 0}
+  .howto{background:var(--lam-clarity);padding:1.5rem 1.75rem;border-left:3px solid var(--lam-sapphire);margin-bottom:3rem}
+  .howto h3{font-size:1.0625rem;font-weight:700;margin-bottom:.5rem}
+  .howto p{margin:0 0 .5rem;font-size:.9375rem;max-width:74ch}
+  .howto p:last-child{margin:0}
+
+  .block{margin:0 0 3.25rem}
+  .block-head{border-top:2px solid var(--lam-onyx);padding-top:1rem;margin-bottom:1.5rem}
+  .block-head .meta{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+  .block-head .kicker{color:var(--lam-sapphire)}
+  .block-head h2{font-size:clamp(2rem,3.6vw,2.875rem);margin:.35rem 0 .25rem}
+  .block-head .sub{font-size:.9375rem;color:#4F5B66;margin:0}
+  .time{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4F5B66;white-space:nowrap}
+
+  /* video slot */
+  .video{margin:0 0 1.5rem}
+  .video-slot{aspect-ratio:16/9;background:var(--lam-ink-blue);color:rgba(255,255,255,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;text-align:center;padding:1rem}
+  .video-slot .kicker{color:rgba(255,255,255,.6)}
+  .video-slot b{font-family:var(--font-display);font-size:1.75rem;font-weight:300;color:var(--lam-sage)}
+  .video-cap{font-size:.75rem;color:#4F5B66;margin:.5rem 0 0}
+
+  /* accordion */
+  .checks{border-top:var(--rule)}
+  details.check{border-bottom:var(--rule)}
+  details.check>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.75rem;padding:1rem .25rem}
+  details.check>summary::-webkit-details-marker{display:none}
+  .chev{flex:0 0 auto;width:11px;height:11px;border-right:2px solid var(--lam-sapphire);border-bottom:2px solid var(--lam-sapphire);transform:rotate(45deg);transition:transform .2s;margin-right:.15rem}
+  details[open]>summary .chev{transform:rotate(-135deg)}
+  .ck-title{flex:1 1 auto;font-weight:700;font-size:1rem}
+  .ck-title em{font-style:normal;font-weight:400;color:#4F5B66}
+  .pill{flex:0 0 auto;font-size:.6875rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.3rem .55rem;border:1px solid var(--lam-highlight-grey);color:#4F5B66;background:var(--lam-light-grey)}
+  .pill.done{background:var(--lam-sage);border-color:#c9d8bd;color:var(--lam-data-dark-green)}
+  .pill.part{background:var(--lam-clarity);border-color:#c5dcee;color:var(--lam-sapphire)}
+  .ck-body{padding:.25rem .25rem 1.75rem}
+
+  /* questions */
+  .q{padding:1.25rem 0;border-top:1px dashed rgba(23,26,28,.14)}
+  .q:first-child{border-top:none;padding-top:.25rem}
+  .q-stem{display:flex;gap:.7rem;margin-bottom:.85rem}
+  .q-num{flex:0 0 auto;font-weight:700;color:var(--lam-sapphire);font-variant-numeric:tabular-nums}
+  .q-stem p{margin:0;font-size:.9375rem;max-width:76ch}
+  .opts{display:grid;gap:.4rem;margin:0 0 0 1.9rem}
+  .opt{display:flex;gap:.65rem;align-items:flex-start;padding:.6rem .75rem;border:1px solid var(--lam-highlight-grey);cursor:pointer;font-size:.9375rem;background:var(--lam-parchment);transition:background .15s,border-color .15s}
+  .opt:hover{background:var(--lam-light-grey)}
+  .opt input{margin:.25rem 0 0;accent-color:var(--lam-sapphire);flex:0 0 auto}
+  .opt .ltr{flex:0 0 auto;font-weight:700;color:#4F5B66}
+  .opt.sel{border-color:var(--lam-sapphire);background:var(--lam-clarity)}
+  .locked .opt{cursor:default}
+  .locked .opt:hover{background:var(--lam-parchment)}
+  .locked .opt.sel{background:var(--lam-clarity)}
+  .opt.right{border-color:var(--lam-data-dark-green);background:var(--lam-sage)}
+  .opt.wrong{border-color:var(--lam-data-red);background:#fbf0ed}
+  .fb{margin:.75rem 0 0 1.9rem;padding:.75rem .9rem;font-size:.875rem;border-left:3px solid var(--lam-highlight-grey);background:var(--lam-light-grey);max-width:76ch}
+  .fb.right{border-left-color:var(--lam-data-dark-green)}
+  .fb.wrong{border-left-color:var(--lam-data-red)}
+  .fb b{display:block;margin-bottom:.2rem}
+  .fb .ref{display:block;margin-top:.35rem;color:#4F5B66;font-size:.8125rem}
+
+  /* actions */
+  .actions{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;margin-top:1.5rem}
+  .btn{font-family:var(--font-body);font-size:.875rem;font-weight:700;letter-spacing:.02em;padding:.75rem 1.35rem;border:1px solid var(--lam-sapphire);background:var(--lam-sapphire);color:var(--lam-parchment);cursor:pointer}
+  .btn:hover{background:#00447f;border-color:#00447f}
+  .btn[disabled]{opacity:.4;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--lam-sapphire)}
+  .btn.ghost:hover{background:var(--lam-clarity)}
+  .score{font-size:.875rem;font-weight:700}
+  .score.pass{color:var(--lam-data-dark-green)}
+  .score.fail{color:var(--lam-data-red)}
+  .note{font-size:.8125rem;color:#4F5B66}
+
+  /* capstone */
+  .capstone{background:var(--lam-onyx);color:var(--lam-parchment);padding:2.5rem 0 3rem;margin-top:1rem}
+  .capstone h2{color:var(--lam-sage);font-size:clamp(2.25rem,4.5vw,3.5rem);margin:.35rem 0 .5rem}
+  .capstone .kicker{color:rgba(255,255,255,.6)}
+  .capstone .sub{color:rgba(255,255,255,.85);font-size:.9375rem;margin:0;max-width:60ch}
+  .cap-card{background:var(--lam-parchment);color:var(--lam-onyx);padding:1.75rem;margin-top:1.75rem}
+  .gate{background:var(--lam-clarity);border-left:3px solid var(--lam-sapphire);padding:.9rem 1rem;font-size:.875rem;margin-bottom:1.5rem}
+  .result{border:1px solid var(--lam-highlight-grey);padding:1.5rem;margin-bottom:1.75rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}
+  .result .big{font-family:var(--font-display);font-size:3.5rem;line-height:1;font-weight:300}
+  .result.pass .big{color:var(--lam-data-dark-green)}
+  .result.fail .big{color:var(--lam-data-red)}
+  .result .verdict{font-weight:700;font-size:1.0625rem;margin:0 0 .3rem}
+  .result .rx{margin:0;font-size:.875rem;color:#4F5B66;max-width:56ch}
+  .weak{margin:.6rem 0 0;font-size:.875rem}
+  .weak span{display:inline-block;background:var(--lam-clarity);color:var(--lam-sapphire);font-weight:700;padding:.15rem .5rem;margin:.15rem .3rem .15rem 0;font-size:.8125rem}
+
+  footer{border-top:var(--rule);margin-top:3rem;padding:1.5rem 0 3rem}
+  footer p{font-size:.6875rem;color:#4F5B66;margin:0 0 .4rem;max-width:80ch}
+  @media(max-width:640px){
+    .opts{margin-left:0}
+    .fb{margin-left:0}
+    .q-stem{gap:.5rem}
+  }
+</style>
+
+<div class="fi">
+  <header class="hero">
+    <div class="wrap">
+      <div class="logo-ph">[LAM logo asset required here]</div>
+      <p class="kicker" style="margin:1.25rem 0 0">Internal Training &middot; Sales Team &middot; Fixed Income 201.1</p>
+      <h1>High Yield</h1>
+      <p>One video, four knowledge checks, one capstone. A sector deep-dive building on Fixed Income 101, prepared ahead of the launch of Lazard&rsquo;s three fixed income ETFs.</p>
+    </div>
+  </header>
+
+  <div class="strip">
+    <div class="wrap strip-in">
+      <small id="p-label">Knowledge checks: 0 of 4 complete</small>
+      <div class="bar"><span id="p-bar"></span></div>
+      <small id="p-cap">Capstone: not attempted</small>
+      <button class="btn ghost" id="reset-all" style="padding:.4rem .7rem;font-size:.75rem">Reset</button>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="howto">
+      <h3>How to Use This Session</h3>
+      <p>Watch the video first, then open the knowledge checks beneath it. Each check is scenario-based on purpose &mdash; the goal is not to recite definitions but to make the right call in a live conversation. Commit to an answer before you check it; the explanation appears either way.</p>
+      <p>Finish with the 10-question capstone. Score 8 or better and you are conversation-ready. Anything you miss points you back to a specific section of the module.</p>
+    </section>
+
+    <div id="blocks"></div>
+  </main>
+
+  <section class="capstone">
+    <div class="wrap">
+      <p class="kicker">Capstone &middot; 8 Minutes</p>
+      <h2>Final Assessment</h2>
+      <p class="sub">10 questions across all five sections of the module. Target: 8 correct. Answers are withheld until you submit.</p>
+      <div class="cap-card">
+        <div id="cap-gate"></div>
+        <div id="cap-result"></div>
+        <div id="cap-questions"></div>
+        <div class="actions" id="cap-actions"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <p><b>Internal use only.</b> Figures in worked examples are illustrative and rounded for teaching purposes. Any market data, yields, or performance references must be verified against current factsheets and approved by Compliance before use in client conversations or materials.</p>
+    <p>Answer options are presented in randomised order, so the letter of a correct answer will not match the printed answer key in Appendix B of the full Word module.</p>
+  </footer>
+</div>
+
+<script type="application/json" id="fi-data">
+{
+  "blocks": [
+    {
+      "id": "b1",
+      "label": "Fixed Income 201.1",
+      "title": "High Yield",
+      "sub": "A sector deep-dive for the sales team &mdash; builds on Fixed Income 101",
+      "time": "55 min",
+      "video": {
+        "title": "High Yield",
+        "runtime": "Video 1 of 1"
+      },
+      "checks": [
+        {
+          "id": "kc1",
+          "n": 1,
+          "sec": "1.1",
+          "title": "The High Yield Universe",
+          "questions": [
+            {
+              "id": "1.1",
+              "stem": "The line separating investment grade from high yield is:",
+              "options": [
+                "AAA versus everything else",
+                "BBB&minus;/Baa3 &mdash; everything rated below is high yield",
+                "BB versus B",
+                "Whether the issuer is publicly listed"
+              ],
+              "answer": 1,
+              "why": "The IG floor is BBB&minus;/Baa3. One notch below it, the buyer base, the behavior, and the vocabulary all change."
+            },
+            {
+              "id": "1.2",
+              "stem": "A client assumes HY issuers are &lsquo;companies nobody has heard of.&rsquo; The most accurate correction:",
+              "options": [
+                "Correct &mdash; HY issuers are all micro-caps",
+                "HY issuers are mostly banks and insurers",
+                "Many are large, well-known companies whose leverage &mdash; often from buyouts or capital-intensive, cyclical businesses &mdash; places them below the IG line",
+                "HY issuers are mostly governments of small countries"
+              ],
+              "answer": 2,
+              "why": "HY issuers skew to leveraged, cyclical, capital-intensive businesses and buyout financings &mdash; many of them large, familiar companies. Absence is informative too: fortress-balance-sheet mega-caps and (in this form) banks don&rsquo;t issue here."
+            },
+            {
+              "id": "1.3",
+              "stem": "Two funds each hold 20% in high yield. Fund X holds BB bonds; Fund Y holds CCC bonds. The right conclusion:",
+              "options": [
+                "Their HY risk is identical &mdash; the label is what matters",
+                "Fund Y carries materially more default and cycle risk; CCC behaves closer to equity while BB behaves closer to IG",
+                "Fund X is riskier because BB bonds are longer",
+                "Neither holds real high yield"
+              ],
+              "answer": 1,
+              "why": "The label conceals the spectrum. BB is a near-IG hybrid; CCC is equity in a bond costume. Quality composition is the real risk statement."
+            }
+          ]
+        },
+        {
+          "id": "kc2",
+          "n": 2,
+          "sec": "1.2",
+          "title": "Return Drivers and Default Math",
+          "questions": [
+            {
+              "id": "2.1",
+              "stem": "Over full market cycles, the largest contributor to high yield total return has been:",
+              "options": [
+                "Spread tightening",
+                "Coupon income (carry)",
+                "Treasury rallies",
+                "Recovery payments from defaulted bonds"
+              ],
+              "answer": 1,
+              "why": "Carry is the engine over full cycles; spread moves add and subtract around it. The 101 lesson &mdash; income is the climate &mdash; amplified."
+            },
+            {
+              "id": "2.2",
+              "stem": "With a 40% recovery rate, a 3% annual default rate implies an expected credit loss of roughly:",
+              "options": [
+                "3.0%",
+                "1.8% &mdash; 3% &times; (1 &minus; 0.40)",
+                "0.4%",
+                "4.2%"
+              ],
+              "answer": 1,
+              "why": "Expected loss = default &times; loss-given-default: 3% &times; 60% = 1.8%. Knowable, diversifiable, and priced."
+            },
+            {
+              "id": "2.3",
+              "stem": "HY spreads sit at 320 bps. Using breakeven logic with 40% recovery, the market is effectively pricing an annual default rate of about:",
+              "options": [
+                "1%",
+                "5.3% &mdash; and paying little extra cushion beyond it",
+                "12%",
+                "Zero &mdash; spreads don&rsquo;t relate to defaults"
+              ],
+              "answer": 1,
+              "why": "320 ÷ (1 &minus; 0.40) &asymp; 5.3%. The market is paying roughly for average default experience with little extra cushion &mdash; the quantitative meaning of &lsquo;tight.&rsquo;"
+            },
+            {
+              "id": "2.4",
+              "stem": "A large IG issuer is downgraded to BB and its bonds fall 8 points in a week on heavy volume. The most professionally useful read:",
+              "options": [
+                "The company is certainly heading to default",
+                "Forced selling by IG-mandated holders often overshoots fundamentals &mdash; fallen angels have historically entered HY at depressed prices and outperformed",
+                "The bonds can no longer be traded",
+                "Ratings changes never move prices"
+              ],
+              "answer": 1,
+              "why": "Mandate-driven selling reflects rules, not analysis. The fallen-angel entry price has historically overshot, which is why the border is hunting ground for active managers."
+            }
+          ]
+        },
+        {
+          "id": "kc3",
+          "n": 3,
+          "sec": "1.3",
+          "title": "Structure and Rate Sensitivity",
+          "questions": [
+            {
+              "id": "3.1",
+              "stem": "A &lsquo;10NC5&rsquo; high yield bond is:",
+              "options": [
+                "A 10% coupon bond with 5 years to maturity",
+                "A 10-year bond that cannot be called for the first 5 years",
+                "A bond rated between 10 and 5",
+                "A floating-rate note"
+              ],
+              "answer": 1,
+              "why": "Maturity/non-call shorthand: ten-year bond, five years of call protection, then callable at stepping-down prices."
+            },
+            {
+              "id": "3.2",
+              "stem": "Rates rally sharply. A HY portfolio full of bonds trading near their call prices lags a Treasury portfolio of equal stated duration. The mechanism:",
+              "options": [
+                "HY bonds have no duration",
+                "Negative convexity &mdash; the issuers&rsquo; call rights cap price appreciation just as the rally makes calls likely",
+                "HY coupons stop accruing in rallies",
+                "The fund&rsquo;s expense ratio doubled"
+              ],
+              "answer": 1,
+              "why": "The call caps upside precisely when the rally makes refinancing attractive &mdash; negative convexity, the structural norm in HY."
+            },
+            {
+              "id": "3.3",
+              "stem": "Compared with investment grade, high yield&rsquo;s sensitivity to Treasury rate moves is:",
+              "options": [
+                "Much higher &mdash; HY has the longest duration in fixed income",
+                "About the same",
+                "Materially lower &mdash; shorter duration and a larger carry cushion make spreads, not rates, the dominant driver",
+                "Exactly zero"
+              ],
+              "answer": 2,
+              "why": "Duration around 3&ndash;4 plus big coupons: rates are a footnote, spreads are the story. That&rsquo;s the diversification case and the honest risk disclosure in one."
+            }
+          ]
+        },
+        {
+          "id": "kc4",
+          "n": 4,
+          "sec": "1.4",
+          "title": "Reading the Market",
+          "questions": [
+            {
+              "id": "4.1",
+              "stem": "HY spreads at multi-decade tights most directly imply:",
+              "options": [
+                "Defaults are impossible",
+                "Thin compensation over expected losses &mdash; the environment where quality positioning and issuer selection matter most",
+                "High yield is guaranteed to outperform",
+                "The Fed controls HY spreads"
+              ],
+              "answer": 1,
+              "why": "Tight spreads mean thin cushion over expected losses &mdash; the market-level reward for indiscriminate exposure is small, so selection carries the load."
+            },
+            {
+              "id": "4.2",
+              "stem": "In a sharp equity selloff, the most typical HY behavior is:",
+              "options": [
+                "Rallying with Treasuries &mdash; HY is a flight-to-quality asset",
+                "Falling as spreads widen &mdash; HY&rsquo;s equity-like credit exposure dominates its modest rate exposure",
+                "No movement &mdash; HY prices are fixed",
+                "Rising because coupons increase"
+              ],
+              "answer": 1,
+              "why": "HY trades with the credit cycle and equities, not with flight-to-quality flows. Never present it as the &lsquo;safe&rsquo; part of the portfolio."
+            },
+            {
+              "id": "4.3",
+              "stem": "The most accurate one-line comparison of HY to equities for a client:",
+              "options": [
+                "They are identical investments",
+                "HY is safer than Treasuries",
+                "Similar economic sensitivity, but HY collects contractual coupons with a senior claim &mdash; historically equity-like returns with lower volatility",
+                "HY only makes money when stocks fall"
+              ],
+              "answer": 2,
+              "why": "Same economic weather as equities, different contract: coupons, seniority, historically shallower drawdowns."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "capstone": [
+    {
+      "id": "c1",
+      "stem": "High yield is defined as corporate debt rated:",
+      "options": [
+        "Below AAA",
+        "Below A",
+        "Below BBB&minus;/Baa3",
+        "Below CCC"
+      ],
+      "answer": 2,
+      "why": "Below BBB&minus;/Baa3 &mdash; the rating line that divides the corporate bond market.",
+      "ref": "1.1"
+    },
+    {
+      "id": "c2",
+      "stem": "The issuer base of high yield is structurally tilted toward:",
+      "options": [
+        "Mega-cap technology franchises with net cash",
+        "Leveraged, cyclical, capital-intensive companies &mdash; including buyout-financed businesses &mdash; plus fallen angels",
+        "Sovereign governments",
+        "Regulated bank capital instruments"
+      ],
+      "answer": 1,
+      "why": "Leverage relative to cash flow is the common thread; buyouts, cyclicals, and fallen angels populate the index.",
+      "ref": "1.1"
+    },
+    {
+      "id": "c3",
+      "stem": "In a typical (non-recession) year, HY default rates have run roughly:",
+      "options": [
+        "0%",
+        "2&ndash;4%",
+        "8&ndash;12%",
+        "25%"
+      ],
+      "answer": 1,
+      "why": "2&ndash;4% is the normal-year range; internalizing it converts fear into arithmetic.",
+      "ref": "1.2"
+    },
+    {
+      "id": "c4",
+      "stem": "With recoveries near 40 cents on the dollar, a 700 bps spread breaks even against a default rate of roughly:",
+      "options": [
+        "2%",
+        "7%",
+        "11&ndash;12% &mdash; close to recession-peak experience",
+        "40%"
+      ],
+      "answer": 2,
+      "why": "700 ÷ 60 &asymp; 11.7% &mdash; recession-peak pricing. Historically that pricing has usually over-shot actual losses.",
+      "ref": "1.2"
+    },
+    {
+      "id": "c5",
+      "stem": "A fallen angel frequently enters the HY index at a depressed price because:",
+      "options": [
+        "Its coupon is cancelled on downgrade",
+        "IG-mandated holders are forced to sell on rules, not fundamentals &mdash; and forced selling overshoots",
+        "HY investors are prohibited from buying it for a year",
+        "Its maturity resets to 30 years"
+      ],
+      "answer": 1,
+      "why": "Rule-driven selling, not fundamentals &mdash; the repeatable inefficiency at the rating border.",
+      "ref": "1.2"
+    },
+    {
+      "id": "c6",
+      "stem": "The standard structure of a new HY bond is:",
+      "options": [
+        "Perpetual with no call rights",
+        "8&ndash;10 year maturity, callable after 3&ndash;5 years at a premium stepping down to par",
+        "Puttable monthly by the investor",
+        "Floating-rate with no coupon"
+      ],
+      "answer": 1,
+      "why": "The 8NC3/10NC5 pattern with stepped call prices is the market standard.",
+      "ref": "1.3"
+    },
+    {
+      "id": "c7",
+      "stem": "For a callable HY bond, the yield figure to anchor client expectations is:",
+      "options": [
+        "Yield to maturity &mdash; always the higher, therefore better, number",
+        "The coupon",
+        "Yield to worst &mdash; the floor across call scenarios, since issuers refinance exactly when the bond is most valuable",
+        "The 5y5y forward"
+      ],
+      "answer": 2,
+      "why": "The issuer&rsquo;s refinancing option makes YTM a scenario the issuer will often prevent; YTW is the floor.",
+      "ref": "1.3"
+    },
+    {
+      "id": "c8",
+      "stem": "HY&rsquo;s rate sensitivity relative to investment grade is:",
+      "options": [
+        "Higher &mdash; longest duration in bonds",
+        "Lower &mdash; duration around 3&ndash;4 years plus a large carry cushion; spreads and the credit cycle dominate",
+        "Identical",
+        "Undefined"
+      ],
+      "answer": 1,
+      "why": "Short duration + carry cushion = the least rate-sensitive major bond sector.",
+      "ref": "1.3"
+    },
+    {
+      "id": "c9",
+      "stem": "HY spreads inside ~300 bps most directly argue for:",
+      "options": [
+        "Maximum indiscriminate HY exposure",
+        "Abandoning credit entirely",
+        "Selectivity &mdash; thin market-level cushion shifts the burden to quality positioning and issuer selection",
+        "Ignoring the spread level"
+      ],
+      "answer": 2,
+      "why": "Thin cushion shifts the burden from beta to selection &mdash; the natural bridge to active management.",
+      "ref": "1.4"
+    },
+    {
+      "id": "c10",
+      "stem": "The most accurate portfolio framing of high yield for a client is:",
+      "options": [
+        "A substitute for Treasuries in flight-to-quality events",
+        "A sized income sleeve with equity-like economic sensitivity &mdash; contractual coupons and a senior claim, historically with shallower drawdowns than stocks",
+        "A cash equivalent",
+        "A rate hedge"
+      ],
+      "answer": 1,
+      "why": "Risk asset, contractual income, senior claim, sized accordingly &mdash; the framing that survives every market environment.",
+      "ref": "1.4"
+    }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- Configuration -------------------------------------------------- */
+  var CONFIG = {
+    REQUIRE_BLOCKS_BEFORE_CAPSTONE: false, /* set true to hard-lock the capstone */
+    SHUFFLE_OPTIONS: true,                 /* set false to keep the printed A-D order */
+    PASS_MARK: 8,
+    STORAGE_KEY: "fi-201-1-hy:v1"
+  };
+
+  var DATA = JSON.parse(document.getElementById("fi-data").textContent);
+  var LETTERS = ["A","B","C","D","E","F"];
+
+  /* ---- State ---------------------------------------------------------- */
+  var state = {
+    answers: {},            /* qid -> original option index */
+    revealed: {},           /* checkId -> true */
+    order: {},              /* qid -> array of original indices, display order */
+    capstone: { answers:{}, submitted:false, attempts:0, best:null }
+  };
+
+  /* Optional persistence. Degrades silently when window.storage is absent
+     (e.g. after export into an LMS or intranet page). */
+  var store = {
+    available: function(){ return typeof window !== "undefined" && window.storage && typeof window.storage.get === "function"; },
+    load: function(){
+      if(!this.available()) return Promise.resolve(null);
+      return window.storage.get(CONFIG.STORAGE_KEY)
+        .then(function(r){ return r && r.value ? JSON.parse(r.value) : null; })
+        .catch(function(){ return null; });
+    },
+    save: function(){
+      if(!this.available()) return;
+      try { window.storage.set(CONFIG.STORAGE_KEY, JSON.stringify(state)); } catch(e){}
+    },
+    clear: function(){
+      if(!this.available()) return;
+      try { window.storage.delete(CONFIG.STORAGE_KEY); } catch(e){}
+    }
+  };
+
+  /* ---- Helpers -------------------------------------------------------- */
+  function allQuestions(){
+    var out = [];
+    DATA.blocks.forEach(function(b){
+      b.checks.forEach(function(c){ c.questions.forEach(function(q){ out.push(q); }); });
+    });
+    return out;
+  }
+  function totalChecks(){
+    var n = 0;
+    DATA.blocks.forEach(function(b){ n += b.checks.length; });
+    return n;
+  }
+  function displayOrder(q){
+    if(state.order[q.id]) return state.order[q.id];
+    var idx = q.options.map(function(_,i){ return i; });
+    if(CONFIG.SHUFFLE_OPTIONS){
+      for(var i = idx.length - 1; i > 0; i--){
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = idx[i]; idx[i] = idx[j]; idx[j] = t;
+      }
+    }
+    state.order[q.id] = idx;
+    return idx;
+  }
+
+  /* ---- Rendering: knowledge checks ------------------------------------ */
+  function questionHTML(q, opts){
+    var group = opts.group;
+    var revealed = opts.revealed;
+    var chosen = opts.chosen;
+    var order = displayOrder(q);
+
+    var html = '<div class="q' + (revealed ? " locked" : "") + '" data-qid="' + q.id + '">';
+    html += '<div class="q-stem"><span class="q-num">' + opts.number + '</span><p>' + q.stem + '</p></div>';
+    html += '<div class="opts">';
+    order.forEach(function(origIdx, pos){
+      var cls = "opt";
+      if(chosen === origIdx) cls += " sel";
+      if(revealed){
+        if(origIdx === q.answer) cls += " right";
+        else if(chosen === origIdx) cls += " wrong";
+      }
+      html += '<label class="' + cls + '">'
+            +   '<input type="radio" name="' + group + "-" + q.id + '" value="' + origIdx + '"'
+            +     (chosen === origIdx ? " checked" : "") + (revealed ? " disabled" : "") + '>'
+            +   '<span class="ltr">' + LETTERS[pos] + '.</span>'
+            +   '<span>' + q.options[origIdx] + '</span>'
+            + '</label>';
+    });
+    html += '</div>';
+
+    if(revealed){
+      var right = chosen === q.answer;
+      html += '<div class="fb ' + (right ? "right" : "wrong") + '">'
+            +   '<b>' + (right ? "Correct" : (chosen === undefined ? "Not answered" : "Not quite")) + '</b>'
+            +   q.why
+            + (opts.ref ? '<span class="ref">Review section ' + opts.ref + '</span>' : "")
+            + '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function checkStatus(check){
+    var answered = check.questions.filter(function(q){ return state.answers[q.id] !== undefined; }).length;
+    var correct = check.questions.filter(function(q){ return state.answers[q.id] === q.answer; }).length;
+    return { answered: answered, correct: correct, total: check.questions.length, revealed: !!state.revealed[check.id] };
+  }
+
+  function renderBlocks(){
+    var host = document.getElementById("blocks");
+    var html = "";
+    DATA.blocks.forEach(function(b){
+      html += '<section class="block" id="' + b.id + '">';
+      html +=   '<div class="block-head"><div class="meta"><div>'
+            +     '<p class="kicker">' + b.label + '</p>'
+            +     '<h2>' + b.title + '</h2>'
+            +     '<p class="sub">' + b.sub + '</p>'
+            +   '</div><span class="time">' + b.time + '</span></div></div>';
+
+      /* Replace the .video-slot div below with your embed, e.g.
+         <iframe src="https://your-video-host/embed/BLOCK-ID" title="..." allowfullscreen
+                 style="width:100%;aspect-ratio:16/9;border:0"></iframe> */
+      html +=   '<div class="video"><div class="video-slot">'
+            +     '<p class="kicker">' + b.video.runtime + '</p>'
+            +     '<b>' + b.video.title + '</b>'
+            +     '<video controls preload="metadata" playsinline style="display:block;width:100%;aspect-ratio:16/9;background:#23283C"><source src="High_Yield_Under_the_Hood.mp4" type="video/mp4">Your browser does not support HTML5 video.</video>'
+            +   '</div><p class="video-cap">Watch this block before opening the knowledge checks below.</p></div>';
+
+      html +=   '<div class="checks">';
+      b.checks.forEach(function(c){
+        var st = checkStatus(c);
+        var pillCls = st.revealed ? "pill done" : (st.answered ? "pill part" : "pill");
+        var pillTxt = st.revealed
+              ? st.correct + " of " + st.total + " correct"
+              : (st.answered ? st.answered + " of " + st.total + " answered" : "Not started");
+        html += '<details class="check" id="d-' + c.id + '"' + (st.answered && !st.revealed ? " open" : "") + '>'
+              +   '<summary><span class="chev"></span>'
+              +     '<span class="ck-title">Knowledge Check ' + c.n + ' &mdash; ' + c.title + ' <em>&middot; &sect;' + c.sec + '</em></span>'
+              +     '<span class="' + pillCls + '" data-pill="' + c.id + '">' + pillTxt + '</span>'
+              +   '</summary>'
+              +   '<div class="ck-body" data-body="' + c.id + '">' + checkBodyHTML(c) + '</div>'
+              + '</details>';
+      });
+      html +=   '</div>';
+      html += '</section>';
+    });
+    host.innerHTML = html;
+  }
+
+  function checkBodyHTML(c){
+    var st = checkStatus(c);
+    var html = "";
+    c.questions.forEach(function(q, i){
+      html += questionHTML(q, {
+        group: "kc",
+        number: c.n + "." + (i + 1),
+        revealed: st.revealed,
+        chosen: state.answers[q.id],
+        ref: st.revealed && state.answers[q.id] !== q.answer ? c.sec : null
+      });
+    });
+    html += '<div class="actions">';
+    if(st.revealed){
+      html += '<span class="score ' + (st.correct === st.total ? "pass" : "") + '">Score: ' + st.correct + " / " + st.total + '</span>'
+            + '<button class="btn ghost" data-retry="' + c.id + '">Clear and Try Again</button>';
+    } else {
+      html += '<button class="btn" data-submit="' + c.id + '"' + (st.answered === st.total ? "" : " disabled") + '>Check Answers</button>'
+            + '<span class="note">' + st.answered + " of " + st.total + ' answered</span>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function refreshCheck(c){
+    var body = document.querySelector('[data-body="' + c.id + '"]');
+    if(body) body.innerHTML = checkBodyHTML(c);
+    var st = checkStatus(c);
+    var pill = document.querySelector('[data-pill="' + c.id + '"]');
+    if(pill){
+      pill.className = st.revealed ? "pill done" : (st.answered ? "pill part" : "pill");
+      pill.textContent = st.revealed
+        ? st.correct + " of " + st.total + " correct"
+        : (st.answered ? st.answered + " of " + st.total + " answered" : "Not started");
+    }
+    updateProgress();
+  }
+
+  function findCheck(id){
+    var found = null;
+    DATA.blocks.forEach(function(b){
+      b.checks.forEach(function(c){ if(c.id === id) found = c; });
+    });
+    return found;
+  }
+
+  /* ---- Rendering: capstone -------------------------------------------- */
+  function checksComplete(){
+    var n = 0;
+    DATA.blocks.forEach(function(b){
+      b.checks.forEach(function(c){ if(state.revealed[c.id]) n++; });
+    });
+    return n;
+  }
+
+  function capstoneScore(){
+    return DATA.capstone.filter(function(q){ return state.capstone.answers[q.id] === q.answer; }).length;
+  }
+
+  function renderCapstone(){
+    var gate = document.getElementById("cap-gate");
+    var result = document.getElementById("cap-result");
+    var qHost = document.getElementById("cap-questions");
+    var actions = document.getElementById("cap-actions");
+    var done = checksComplete();
+    var locked = CONFIG.REQUIRE_BLOCKS_BEFORE_CAPSTONE && done < totalChecks();
+
+    gate.innerHTML = done < totalChecks()
+      ? '<div class="gate"><b>' + done + " of " + totalChecks() + ' knowledge checks complete.</b> '
+        + (locked ? "Finish all four before starting the capstone."
+                  : "You can start the capstone now, but the video and knowledge checks are the study material for it.")
+        + '</div>'
+      : "";
+
+    if(locked){
+      result.innerHTML = "";
+      qHost.innerHTML = "";
+      actions.innerHTML = "";
+      return;
+    }
+
+    /* Result panel */
+    if(state.capstone.submitted){
+      var sc = capstoneScore();
+      var pass = sc >= CONFIG.PASS_MARK;
+      var verdict, rx;
+      if(sc >= 8){ verdict = "Conversation-ready."; rx = "You can carry these frames into client and consultant meetings."; }
+      else if(sc >= 6){ verdict = "Solid."; rx = "Revisit the sections tied to your misses, listed beneath each question."; }
+      else { verdict = "More work needed."; rx = "Re-run Sections 1.2 and 1.5 of the module before client meetings &mdash; the default math and the three conversations carry this sector."; }
+
+      var misses = {};
+      DATA.capstone.forEach(function(q){
+        if(state.capstone.answers[q.id] !== q.answer) misses[q.ref] = (misses[q.ref] || 0) + 1;
+      });
+      var missKeys = Object.keys(misses).sort();
+
+      result.innerHTML = '<div class="result ' + (pass ? "pass" : "fail") + '">'
+        + '<div class="big">' + sc + '<span style="font-size:1.25rem;color:#4F5B66"> / ' + DATA.capstone.length + '</span></div>'
+        + '<div><p class="verdict">' + verdict + '</p><p class="rx">' + rx + '</p>'
+        + (missKeys.length ? '<p class="weak">Sections to revisit: ' + missKeys.map(function(k){ return '<span>&sect;' + k + '</span>'; }).join("") + '</p>' : "")
+        + '</div></div>';
+    } else {
+      result.innerHTML = "";
+    }
+
+    /* Questions */
+    var html = "";
+    DATA.capstone.forEach(function(q, i){
+      html += questionHTML(q, {
+        group: "cap",
+        number: String(i + 1),
+        revealed: state.capstone.submitted,
+        chosen: state.capstone.answers[q.id],
+        ref: state.capstone.submitted && state.capstone.answers[q.id] !== q.answer ? q.ref : null
+      });
+    });
+    qHost.innerHTML = html;
+
+    /* Actions */
+    var answered = Object.keys(state.capstone.answers).length;
+    if(state.capstone.submitted){
+      actions.innerHTML = '<button class="btn" id="cap-retake">Retake Capstone</button>'
+        + '<span class="note">Attempt ' + state.capstone.attempts
+        + (state.capstone.best !== null ? " &middot; best score " + state.capstone.best + " / " + DATA.capstone.length : "")
+        + '</span>';
+    } else {
+      actions.innerHTML = '<button class="btn" id="cap-submit"' + (answered === DATA.capstone.length ? "" : " disabled") + '>Submit and Score</button>'
+        + '<span class="note">' + answered + " of " + DATA.capstone.length + ' answered &middot; pass mark ' + CONFIG.PASS_MARK + '</span>';
+    }
+    updateProgress();
+  }
+
+  /* ---- Progress ------------------------------------------------------- */
+  function updateProgress(){
+    var done = checksComplete();
+    var tot = totalChecks();
+    document.getElementById("p-label").textContent = "Knowledge checks: " + done + " of " + tot + " complete";
+    document.getElementById("p-bar").style.width = (done / tot * 100) + "%";
+    var cap = document.getElementById("p-cap");
+    if(state.capstone.submitted){
+      var sc = capstoneScore();
+      cap.textContent = "Capstone: " + sc + " / " + DATA.capstone.length + (sc >= CONFIG.PASS_MARK ? " \u2014 passed" : "");
+    } else {
+      cap.textContent = "Capstone: not attempted";
+    }
+  }
+
+  /* ---- Events --------------------------------------------------------- */
+  document.addEventListener("change", function(e){
+    var input = e.target;
+    if(input.tagName !== "INPUT" || input.type !== "radio") return;
+    var name = input.name || "";
+    var qid = name.slice(name.indexOf("-") + 1);
+    var val = parseInt(input.value, 10);
+
+    if(name.indexOf("kc-") === 0){
+      state.answers[qid] = val;
+      var q = allQuestions().filter(function(x){ return x.id === qid; })[0];
+      var owner = null;
+      DATA.blocks.forEach(function(b){
+        b.checks.forEach(function(c){
+          if(c.questions.some(function(x){ return x.id === qid; })) owner = c;
+        });
+      });
+      /* Update selection styling and the submit button without a full re-render,
+         so radio focus is not lost mid-check. */
+      var wrapEl = input.closest(".q");
+      if(wrapEl){
+        wrapEl.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("sel"); });
+        input.closest(".opt").classList.add("sel");
+      }
+      if(owner){
+        var st = checkStatus(owner);
+        var body = document.querySelector('[data-body="' + owner.id + '"]');
+        var btn = body && body.querySelector("[data-submit]");
+        var note = body && body.querySelector(".note");
+        if(btn) btn.disabled = st.answered !== st.total;
+        if(note) note.textContent = st.answered + " of " + st.total + " answered";
+        var pill = document.querySelector('[data-pill="' + owner.id + '"]');
+        if(pill && !st.revealed){
+          pill.className = "pill part";
+          pill.textContent = st.answered + " of " + st.total + " answered";
+        }
+      }
+    } else if(name.indexOf("cap-") === 0){
+      state.capstone.answers[qid] = val;
+      var wrap2 = input.closest(".q");
+      if(wrap2){
+        wrap2.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("sel"); });
+        input.closest(".opt").classList.add("sel");
+      }
+      var answered = Object.keys(state.capstone.answers).length;
+      var sbtn = document.getElementById("cap-submit");
+      if(sbtn) sbtn.disabled = answered !== DATA.capstone.length;
+      var snote = document.querySelector("#cap-actions .note");
+      if(snote) snote.textContent = answered + " of " + DATA.capstone.length + " answered \u00b7 pass mark " + CONFIG.PASS_MARK;
+    }
+    store.save();
+  });
+
+  document.addEventListener("click", function(e){
+    var t = e.target;
+
+    if(t.dataset && t.dataset.submit){
+      var c = findCheck(t.dataset.submit);
+      if(c){ state.revealed[c.id] = true; refreshCheck(c); renderCapstone(); store.save(); }
+      return;
+    }
+    if(t.dataset && t.dataset.retry){
+      var c2 = findCheck(t.dataset.retry);
+      if(c2){
+        delete state.revealed[c2.id];
+        c2.questions.forEach(function(q){ delete state.answers[q.id]; delete state.order[q.id]; });
+        refreshCheck(c2); renderCapstone(); store.save();
+      }
+      return;
+    }
+    if(t.id === "cap-submit"){
+      state.capstone.submitted = true;
+      state.capstone.attempts += 1;
+      var sc = capstoneScore();
+      state.capstone.best = state.capstone.best === null ? sc : Math.max(state.capstone.best, sc);
+      renderCapstone();
+      store.save();
+      document.getElementById("cap-result").scrollIntoView({ behavior:"smooth", block:"center" });
+      return;
+    }
+    if(t.id === "cap-retake"){
+      state.capstone.submitted = false;
+      state.capstone.answers = {};
+      DATA.capstone.forEach(function(q){ delete state.order[q.id]; });
+      renderCapstone();
+      store.save();
+      return;
+    }
+    if(t.id === "reset-all"){
+      state = { answers:{}, revealed:{}, order:{}, capstone:{ answers:{}, submitted:false, attempts:0, best:null } };
+      store.clear();
+      renderBlocks(); renderCapstone(); updateProgress();
+      return;
+    }
+  });
+
+  /* ---- Boot ----------------------------------------------------------- */
+  function boot(saved){
+    if(saved && saved.answers){
+      state.answers = saved.answers || {};
+      state.revealed = saved.revealed || {};
+      state.order = saved.order || {};
+      state.capstone = saved.capstone || state.capstone;
+    }
+    renderBlocks();
+    renderCapstone();
+    updateProgress();
+  }
+
+  store.load().then(boot).catch(function(){ boot(null); });
+})();
+</script>
