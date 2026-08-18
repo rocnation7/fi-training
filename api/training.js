@@ -52,7 +52,7 @@ module.exports = async (req, res) => {
     if (req.method === "POST") {
       const fullName = String(req.body && req.body.fullName || "").trim();
       const email = String(req.body && req.body.email || "").trim().toLowerCase();
-      if (!fullName || !/^\S+@\S+\.\S+$/.test(email)) return response(res, 400, { error: "A full name and valid email are required." });
+      if (!fullName || !/^[^@\s]+@lazard\.com$/i.test(email)) return response(res, 400, { error: "Use your @lazard.com work email to access the academy." });
 
       const dbResponse = await supabase("training_records?on_conflict=email", {
         method: "POST",

@@ -1316,5 +1316,18 @@
   store.load().then(boot).catch(function(){ boot(null); });
 })();
 </script>
+<script src="academy.js"></script>
+<script>
+  (function(){
+    var learner = window.LamAcademy && window.LamAcademy.session();
+    if(!learner){ window.location.replace("index.html?next=fi101.html"); return; }
+    var form = document.getElementById("enrollment-form");
+    if(form){
+      form.elements.fullName.value = learner.fullName || "";
+      form.elements.email.value = learner.email || "";
+      form.requestSubmit();
+    }
+  })();
+</script>
 </body>
 </html>
