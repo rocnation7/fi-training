@@ -26,16 +26,14 @@
   }
   function applyVideoGate(course) {
     var video = document.querySelector("video[data-video]");
-    var checks = Array.prototype.slice.call(document.querySelectorAll(".checks, .capstone"));
-    if (!video || !checks.length) return;
+    if (!video) return;
     var note = document.createElement("p");
     note.className = "video-gate-message";
     note.setAttribute("role", "status");
     video.closest(".video").after(note);
     function render() {
       var complete = videoComplete(course);
-      checks.forEach(function (section) { section.hidden = !complete; });
-      note.textContent = complete ? "Video complete. Your knowledge checks and final assessment are now unlocked." : "Finish the video to unlock the knowledge checks and final assessment.";
+      note.textContent = complete ? "Video complete. Knowledge Check 1 is now unlocked; complete each check in sequence to reach the final assessment." : "Finish the video to unlock Knowledge Check 1.";
     }
     video.addEventListener("ended", function () { window.localStorage.setItem(videoKey(course), "true"); updateCourse(course); render(); });
     render();

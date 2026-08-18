@@ -54,6 +54,7 @@
 
   /* accordion */
   .checks{border-top:var(--rule)}
+  .check-locked{padding:1rem .25rem;border-bottom:var(--rule);color:#4F5B66;font-size:.875rem}
   details.check{border-bottom:var(--rule)}
   details.check>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.75rem;padding:1rem .25rem}
   details.check>summary::-webkit-details-marker{display:none}
@@ -130,7 +131,7 @@
   <header class="hero">
     <div class="wrap">
       <img src="LazardLogoBlack.svg" alt="Lazard Asset Management" style="display:block;width:154px;height:auto;filter:invert(1)">
-      <p class="kicker" style="margin:1.25rem 0 0">Internal Training &middot; Sales Team &middot; Fixed Income 201.2</p>
+      <p class="kicker" style="margin:1.25rem 0 0"><a href="index.html" style="color:inherit">Fixed Income Academy</a> &middot; Sales Team &middot; Fixed Income 201.2</p>
       <h1>Emerging Market Debt</h1>
       <p>One video, four knowledge checks, one capstone. A sector deep-dive building on Fixed Income 101, prepared ahead of the launch of Lazard&rsquo;s three fixed income ETFs.</p>
     </div>
@@ -533,13 +534,14 @@
 
   /* ---- Configuration -------------------------------------------------- */
   var CONFIG = {
-    REQUIRE_BLOCKS_BEFORE_CAPSTONE: false, /* set true to hard-lock the capstone */
+    REQUIRE_BLOCKS_BEFORE_CAPSTONE: true,
     SHUFFLE_OPTIONS: true,                 /* set false to keep the printed A-D order */
     PASS_MARK: 8,
     STORAGE_KEY: "fi-201-2-emd:v1"
   };
 
   var DATA = JSON.parse(document.getElementById("fi-data").textContent);
+  var COURSE_ID = "emerging-market-debt";
   var LETTERS = ["A","B","C","D","E","F"];
 
   /* ---- State ---------------------------------------------------------- */
@@ -635,6 +637,10 @@
     return { answered: answered, correct: correct, total: check.questions.length, revealed: !!state.revealed[check.id] };
   }
 
+  function videoComplete(){
+    try { return window.localStorage.getItem("lam-fi-video-complete:" + COURSE_ID + ":v1") === "true"; } catch(e) { return false; }
+  }
+  function checkUnlocked(checks, index){ return videoComplete() && (index === 0 || !!state.revealed[checks[index - 1].id]); }
   function renderBlocks(){
     var host = document.getElementById("blocks");
     var html = "";
@@ -656,7 +662,12 @@
             +   '</div><p class="video-cap">Watch this block before opening the knowledge checks below.</p></div>';
 
       html +=   '<div class="checks">';
-      b.checks.forEach(function(c){
+      b.checks.forEach(function(c, checkIndex){
+        if(!checkUnlocked(b.checks, checkIndex)){
+          var message = !videoComplete() ? "Finish this video to unlock Knowledge Check " + c.n + "." : "Complete Knowledge Check " + b.checks[checkIndex - 1].n + " to unlock this section.";
+          html += '<div class="check-locked"><b>Knowledge Check ' + c.n + ' &mdash; ' + c.title + '</b><br>' + message + '</div>';
+          return;
+        }
         var st = checkStatus(c);
         var pillCls = st.revealed ? "pill done" : (st.answered ? "pill part" : "pill");
         var pillTxt = st.revealed
@@ -881,7 +892,7 @@
 
     if(t.dataset && t.dataset.submit){
       var c = findCheck(t.dataset.submit);
-      if(c){ state.revealed[c.id] = true; refreshCheck(c); renderCapstone(); store.save(); syncAcademyCourse(); }
+      if(c){ state.revealed[c.id] = true; renderBlocks(); renderCapstone(); store.save(); syncAcademyCourse(); }
       return;
     }
     if(t.dataset && t.dataset.retry){
@@ -889,7 +900,7 @@
       if(c2){
         delete state.revealed[c2.id];
         c2.questions.forEach(function(q){ delete state.answers[q.id]; delete state.order[q.id]; });
-        refreshCheck(c2); renderCapstone(); store.save();
+        renderBlocks(); renderCapstone(); store.save();
       }
       return;
     }
@@ -919,6 +930,13 @@
       return;
     }
   });
+
+  document.addEventListener("ended", function(e){
+    if(e.target.tagName !== "VIDEO" || e.target.dataset.video !== COURSE_ID) return;
+    try { window.localStorage.setItem("lam-fi-video-complete:" + COURSE_ID + ":v1", "true"); } catch(err) {}
+    if(window.LamAcademy) window.LamAcademy.updateCourse(COURSE_ID);
+    renderBlocks(); renderCapstone(); updateProgress();
+  }, true);
 
   /* ---- Boot ----------------------------------------------------------- */
   function boot(saved){
