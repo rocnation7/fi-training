@@ -14,6 +14,7 @@ create table if not exists public.training_records (
 
 -- Required for existing projects created before learner progress could be restored.
 alter table public.training_records add column if not exists knowledge_check_answers jsonb not null default '{}'::jsonb;
+alter table public.training_records add column if not exists course_progress jsonb not null default '{}'::jsonb;
 
 create table if not exists public.training_attempts (
   id bigint generated always as identity primary key,

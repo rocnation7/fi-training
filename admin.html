@@ -19,7 +19,7 @@
   </section>
   <section class="card dashboard" id="dashboard" aria-labelledby="dashboard-title">
     <div class="summary"><div><p class="eyebrow">Learner progress</p><h2 id="dashboard-title">Training register</h2><p class="count" id="count">Loading…</p></div><div class="summary-actions"><button class="ghost" id="export" type="button">Export Excel (.csv)</button><button class="ghost" id="refresh" type="button">Refresh</button></div></div>
-    <div class="table-wrap"><table><thead><tr><th>Learner</th><th>Email</th><th>Status</th><th>Videos</th><th>Checks</th><th>Capstone</th><th>Started</th><th>Last active</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th>Learner</th><th>Email</th><th>Courses completed</th><th>FI 101</th><th>High Yield</th><th>EM Debt</th><th>Started</th><th>Last active</th></tr></thead><tbody id="rows"></tbody></table></div>
   </section>
   <p class="last" id="last"></p>
 </main>
@@ -34,12 +34,19 @@
   function date(value){ return value ? new Date(value).toLocaleString() : "—"; }
   function count(value){ return Array.isArray(value) ? value.length : 0; }
   function status(learner){ return learner.completed_at ? "Completed" : "In progress"; }
+  function course(learner, id){
+    var value = learner.course_progress && learner.course_progress[id];
+    if(value) return value;
+    return id === "fi101" && learner.completed_at ? { completedAt: learner.completed_at } : {};
+  }
+  function courseStatus(learner, id){ return course(learner, id).completedAt ? "Completed" : "In progress"; }
+  function completedCourses(learner){ return ["fi101","high-yield","emerging-market-debt"].filter(function(id){ return course(learner,id).completedAt; }).length; }
   function cell(row, text, className){ var td = document.createElement("td"); td.textContent = text; if(className) td.className = className; row.appendChild(td); }
   function statusCell(row, learner){ var td = document.createElement("td"); var tag = document.createElement("span"); tag.className = "status " + (learner.completed_at ? "done" : "progress"); tag.textContent = status(learner); td.appendChild(tag); row.appendChild(td); }
   function csvCell(value){ return '"' + String(value === null || value === undefined ? "" : value).replace(/"/g, '""') + '"'; }
   function exportCsv(){
-    var columns = ["Learner","Email","Status","Videos completed","Knowledge checks completed","Capstone score","Started","Last active","Completed"];
-    var lines = [columns.map(csvCell).join(",")].concat(learners.map(function(learner){ return [learner.full_name,learner.email,status(learner),count(learner.completed_videos),count(learner.completed_checks),learner.latest_capstone_score === null ? "" : learner.latest_capstone_score + " / 15",learner.created_at,learner.updated_at,learner.completed_at].map(csvCell).join(","); }));
+    var columns = ["Learner","Email","Courses completed","FI 101","High Yield","Emerging Market Debt","Started","Last active"];
+    var lines = [columns.map(csvCell).join(",")].concat(learners.map(function(learner){ return [learner.full_name,learner.email,completedCourses(learner) + " / 3",courseStatus(learner,"fi101"),courseStatus(learner,"high-yield"),courseStatus(learner,"emerging-market-debt"),learner.created_at,learner.updated_at].map(csvCell).join(","); }));
     var blob = new Blob(["\ufeff" + lines.join("\r\n")], { type:"text/csv;charset=utf-8" });
     var link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "fi-training-learner-progress-" + new Date().toISOString().slice(0,10) + ".csv"; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
   }
@@ -51,9 +58,9 @@
       learners = body.learners || [];
       rows.innerHTML = "";
       if(!learners.length){ var empty = document.createElement("tr"); var td = document.createElement("td"); td.colSpan = 8; td.className = "empty"; td.textContent = "No learners have started the training yet."; empty.appendChild(td); rows.appendChild(empty); }
-      learners.forEach(function(learner){ var row = document.createElement("tr"); cell(row, learner.full_name); cell(row, learner.email); statusCell(row, learner); cell(row, count(learner.completed_videos) + " / 3"); cell(row, count(learner.completed_checks) + " / 9"); cell(row, learner.latest_capstone_score === null ? "—" : learner.latest_capstone_score + " / 15", learner.latest_capstone_score === null ? "" : "score"); cell(row, date(learner.created_at)); cell(row, date(learner.updated_at)); rows.appendChild(row); });
-      var completed = learners.filter(function(learner){ return !!learner.completed_at; }).length;
-      document.getElementById("count").textContent = learners.length + (learners.length === 1 ? " learner" : " learners") + " · " + completed + " completed · " + (learners.length - completed) + " in progress";
+      learners.forEach(function(learner){ var row = document.createElement("tr"); cell(row, learner.full_name); cell(row, learner.email); cell(row, completedCourses(learner) + " / 3", "score"); ["fi101","high-yield","emerging-market-debt"].forEach(function(id){ cell(row, courseStatus(learner,id)); }); cell(row, date(learner.created_at)); cell(row, date(learner.updated_at)); rows.appendChild(row); });
+      var completed = learners.reduce(function(total, learner){ return total + completedCourses(learner); }, 0);
+      document.getElementById("count").textContent = learners.length + (learners.length === 1 ? " learner" : " learners") + " · " + completed + " course completions recorded";
       document.getElementById("last").textContent = "Last refreshed " + new Date().toLocaleTimeString();
       document.getElementById("login-card").style.display = "none"; dashboard.style.display = "block";
     }).catch(function(error){ notice.textContent = error.message; });

@@ -7,6 +7,23 @@
   function destination(value) { return allowedDestinations.indexOf(value) !== -1 ? value : "fi101.html"; }
   function videoKey(course) { return "lam-fi-video-complete:" + course + ":v1"; }
   function videoComplete(course) { return window.localStorage.getItem(videoKey(course)) === "true"; }
+  function updateCourse(course, progress) {
+    var learner = session();
+    if (!learner || !learner.id) return Promise.resolve(null);
+    progress = progress || {};
+    return fetch("/api/training", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        learnerId: learner.id,
+        course: course,
+        completedVideos: progress.completedVideos || (videoComplete(course) ? [course] : []),
+        completedChecks: progress.completedChecks || [],
+        capstoneScore: progress.capstoneScore,
+        completed: !!progress.completed
+      })
+    }).catch(function () { return null; });
+  }
   function applyVideoGate(course) {
     var video = document.querySelector("video[data-video]");
     var checks = Array.prototype.slice.call(document.querySelectorAll(".checks, .capstone"));
@@ -20,10 +37,10 @@
       checks.forEach(function (section) { section.hidden = !complete; });
       note.textContent = complete ? "Video complete. Your knowledge checks and final assessment are now unlocked." : "Finish the video to unlock the knowledge checks and final assessment.";
     }
-    video.addEventListener("ended", function () { window.localStorage.setItem(videoKey(course), "true"); render(); });
+    video.addEventListener("ended", function () { window.localStorage.setItem(videoKey(course), "true"); updateCourse(course); render(); });
     render();
   }
-  window.LamAcademy = { session: session, saveSession: saveSession, destination: destination };
+  window.LamAcademy = { session: session, saveSession: saveSession, destination: destination, updateCourse: updateCourse };
   var current = document.currentScript;
   var course = current && current.dataset.course;
   if (course && !session()) { window.location.replace("index.html?next=" + encodeURIComponent(window.location.pathname.split("/").pop())); return; }
