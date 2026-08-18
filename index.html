@@ -11,7 +11,7 @@
 </head>
 <body>
   <header class="hero"><div class="wrap"><img class="logo" src="LazardLogoBlack.svg" alt="Lazard"><div class="hero-grid"><div><p class="label">Fixed Income Academy · Sales Team</p><h1>Fixed-income fluency, built one conversation at a time.</h1><p class="hero-copy">Start with the foundation. Then choose the sector expertise your next client conversation calls for.</p></div><form class="academy-login" id="academy-login"><p class="label">Enter the academy</p><label for="academy-name">Full name</label><input id="academy-name" name="fullName" autocomplete="name" required><label for="academy-email">Email address</label><input id="academy-email" name="email" type="email" autocomplete="email" placeholder="name@lazard.com" required><button class="button" type="submit">Continue</button><p class="login-status" id="login-status"></p></form></div></div></header>
-  <main class="wrap">
+  <main class="wrap" id="academy-content" hidden>
     <section class="intro"><p class="label">Learning path</p><p>Complete Fixed Income 101 first. High Yield and Emerging Market Debt then become your on-demand sector deep dives, each with a video lesson, progressive knowledge checks, and a final assessment.</p></section>
     <section class="courses" aria-label="Course catalog">
       <article class="course"><span class="code">FI 101 · FOUNDATION</span><h2>Fixed Income Fluency</h2><p>The mechanics, market context, and client language behind every fixed-income conversation.</p><dl><div><dt>Duration</dt><dd>Approx. 95 min</dd></div><div><dt>Format</dt><dd>3 lessons · final</dd></div></dl><footer><span class="tag">Start here</span><br><a class="button" href="fi101.html">Begin FI 101</a></footer></article>
@@ -22,9 +22,15 @@
   <script src="academy.js"></script>
   <script>
     (function(){
-      var form = document.getElementById("academy-login"), status = document.getElementById("login-status");
+      var form = document.getElementById("academy-login"), status = document.getElementById("login-status"), content = document.getElementById("academy-content");
       var existing = window.LamAcademy && window.LamAcademy.session();
-      if(existing){ form.elements.fullName.value = existing.fullName || ""; form.elements.email.value = existing.email || ""; status.textContent = "Welcome back, " + (existing.fullName || "").split(" ")[0] + ". Choose a course to continue."; }
+      function unlock(learner){
+        content.hidden = false;
+        form.elements.fullName.value = learner.fullName || "";
+        form.elements.email.value = learner.email || "";
+        status.textContent = "Welcome back, " + (learner.fullName || "").split(" ")[0] + ". Choose a course to continue.";
+      }
+      if(existing) unlock(existing);
       form.addEventListener("submit", function(event){
         event.preventDefault();
         var fullName = form.elements.fullName.value.trim(), email = form.elements.email.value.trim().toLowerCase();
@@ -32,7 +38,12 @@
         var button = form.querySelector("button"); button.disabled = true; status.textContent = "Signing you in…";
         fetch("/api/training", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({fullName:fullName,email:email})})
           .then(function(response){ if(!response.ok) return response.json().then(function(body){ throw new Error(body.error || "Unable to sign in."); }); return response.json(); })
-          .then(function(learner){ window.LamAcademy.saveSession(learner); var next = window.LamAcademy.destination(new URLSearchParams(window.location.search).get("next")); window.location.assign(next); })
+          .then(function(learner){
+            window.LamAcademy.saveSession(learner);
+            var requested = new URLSearchParams(window.location.search).get("next");
+            if(requested) window.location.assign(window.LamAcademy.destination(requested));
+            else { unlock(learner); button.disabled = false; }
+          })
           .catch(function(error){ status.textContent = error.message; button.disabled = false; });
       });
     })();
