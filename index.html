@@ -34,7 +34,7 @@
       form.addEventListener("submit", function(event){
         event.preventDefault();
         var fullName = form.elements.fullName.value.trim(), email = form.elements.email.value.trim().toLowerCase();
-        if(!/^[^@\\s]+@lazard\\.com$/i.test(email)){ status.textContent = "Please use your @lazard.com work email."; return; }
+        if(!/^[^@\s]+@lazard\.com$/i.test(email)){ status.textContent = "Please use your @lazard.com work email."; return; }
         var button = form.querySelector("button"); button.disabled = true; status.textContent = "Signing you in…";
         fetch("/api/training", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({fullName:fullName,email:email})})
           .then(function(response){ if(!response.ok) return response.json().then(function(body){ throw new Error(body.error || "Unable to sign in."); }); return response.json(); })
