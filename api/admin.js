@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
 
   try {
     const dbResponse = await supabase(
-      "training_records?select=full_name,email,created_at,updated_at,completed_at,completed_videos,completed_checks,latest_capstone_score&order=updated_at.desc"
+      "training_records?select=full_name,email,created_at,updated_at,completed_at,completed_videos,completed_checks,latest_capstone_score,course_progress&order=updated_at.desc"
     );
     if (!dbResponse.ok) throw new Error(await dbResponse.text());
     const learners = await dbResponse.json();

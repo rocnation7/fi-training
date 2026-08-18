@@ -1,4 +1,5 @@
 const ANSWER_KEY = [1, 2, 1, 1, 1, 1, 2, 1, 2, 0, 1, 1, 1, 1, 2];
+const COURSES = ["fi101", "high-yield", "emerging-market-debt"];
 
 function response(res, status, body) {
   res.status(status).json(body);
@@ -71,6 +72,33 @@ module.exports = async (req, res) => {
 
     const learnerId = String(req.body && req.body.learnerId || "");
     if (!learnerId) return response(res, 400, { error: "Learner ID is required." });
+    const course = String(req.body && req.body.course || "");
+    if (course) {
+      if (!COURSES.includes(course)) return response(res, 400, { error: "Unknown course." });
+      const recordResponse = await supabase(`training_records?id=eq.${encodeURIComponent(learnerId)}&select=id,course_progress`, { method: "GET" });
+      if (!recordResponse.ok) throw new Error(await recordResponse.text());
+      const [record] = await recordResponse.json();
+      if (!record) return response(res, 404, { error: "Learner record not found." });
+      const current = record.course_progress && typeof record.course_progress === "object" ? record.course_progress : {};
+      const prior = current[course] || {};
+      const completedVideos = Array.isArray(req.body.completedVideos) ? req.body.completedVideos : (prior.completedVideos || []);
+      const completedChecks = Array.isArray(req.body.completedChecks) ? req.body.completedChecks : (prior.completedChecks || []);
+      const hasCapstoneScore = req.body.capstoneScore !== null && req.body.capstoneScore !== undefined && Number.isFinite(Number(req.body.capstoneScore));
+      const capstoneScore = hasCapstoneScore ? Number(req.body.capstoneScore) : (prior.capstoneScore ?? null);
+      current[course] = {
+        completedVideos,
+        completedChecks,
+        capstoneScore,
+        completedAt: req.body.completed ? (prior.completedAt || new Date().toISOString()) : (prior.completedAt || null),
+        updatedAt: new Date().toISOString()
+      };
+      const dbResponse = await supabase(`training_records?id=eq.${encodeURIComponent(learnerId)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ course_progress: current, updated_at: new Date().toISOString() })
+      });
+      if (!dbResponse.ok) throw new Error(await dbResponse.text());
+      return response(res, 200, { courseProgress: current });
+    }
     const completedChecks = Array.isArray(req.body.completedChecks) ? req.body.completedChecks : [];
     const completedVideos = Array.isArray(req.body.completedVideos) ? req.body.completedVideos : [];
     const knowledgeCheckAnswers = req.body.knowledgeCheckAnswers && typeof req.body.knowledgeCheckAnswers === "object"
@@ -89,6 +117,12 @@ module.exports = async (req, res) => {
       update.capstone_answers = answers;
       if (score >= 12) update.completed_at = new Date().toISOString();
     }
+    const priorResponse = await supabase(`training_records?id=eq.${encodeURIComponent(learnerId)}&select=course_progress`, { method: "GET" });
+    if (!priorResponse.ok) throw new Error(await priorResponse.text());
+    const [priorRecord] = await priorResponse.json();
+    const courseProgress = priorRecord && priorRecord.course_progress && typeof priorRecord.course_progress === "object" ? priorRecord.course_progress : {};
+    courseProgress.fi101 = { completedVideos, completedChecks, capstoneScore: score, completedAt: score !== null && score >= 12 ? new Date().toISOString() : (courseProgress.fi101 && courseProgress.fi101.completedAt) || null, updatedAt: new Date().toISOString() };
+    update.course_progress = courseProgress;
     const dbResponse = await supabase(`training_records?id=eq.${encodeURIComponent(learnerId)}`, { method: "PATCH", body: JSON.stringify(update) });
     if (!dbResponse.ok) throw new Error(await dbResponse.text());
     const [record] = await dbResponse.json();

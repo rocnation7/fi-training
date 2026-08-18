@@ -572,6 +572,12 @@
     DATA.blocks.forEach(function(b){ n += b.checks.length; });
     return n;
   }
+  function syncAcademyCourse(){
+    if(!window.LamAcademy) return;
+    var completedChecks = [];
+    DATA.blocks.forEach(function(b){ b.checks.forEach(function(c){ if(state.revealed[c.id]) completedChecks.push(c.id); }); });
+    window.LamAcademy.updateCourse("emerging-market-debt", { completedChecks: completedChecks, capstoneScore: state.capstone.submitted ? capstoneScore() : null, completed: state.capstone.submitted && capstoneScore() >= CONFIG.PASS_MARK });
+  }
   function displayOrder(q){
     if(state.order[q.id]) return state.order[q.id];
     var idx = q.options.map(function(_,i){ return i; });
@@ -875,7 +881,7 @@
 
     if(t.dataset && t.dataset.submit){
       var c = findCheck(t.dataset.submit);
-      if(c){ state.revealed[c.id] = true; refreshCheck(c); renderCapstone(); store.save(); }
+      if(c){ state.revealed[c.id] = true; refreshCheck(c); renderCapstone(); store.save(); syncAcademyCourse(); }
       return;
     }
     if(t.dataset && t.dataset.retry){
@@ -894,6 +900,7 @@
       state.capstone.best = state.capstone.best === null ? sc : Math.max(state.capstone.best, sc);
       renderCapstone();
       store.save();
+      syncAcademyCourse();
       document.getElementById("cap-result").scrollIntoView({ behavior:"smooth", block:"center" });
       return;
     }
