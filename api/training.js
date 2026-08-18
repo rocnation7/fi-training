@@ -66,7 +66,8 @@ module.exports = async (req, res) => {
         id: record.id,
         fullName: record.full_name,
         email: record.email,
-        progress: await learnerProgress(record)
+        progress: await learnerProgress(record),
+        courseProgress: record.course_progress && typeof record.course_progress === "object" ? record.course_progress : {}
       });
     }
 
@@ -85,10 +86,20 @@ module.exports = async (req, res) => {
       const completedChecks = Array.isArray(req.body.completedChecks) ? req.body.completedChecks : (prior.completedChecks || []);
       const hasCapstoneScore = req.body.capstoneScore !== null && req.body.capstoneScore !== undefined && Number.isFinite(Number(req.body.capstoneScore));
       const capstoneScore = hasCapstoneScore ? Number(req.body.capstoneScore) : (prior.capstoneScore ?? null);
+      const knowledgeCheckAnswers = req.body.knowledgeCheckAnswers && typeof req.body.knowledgeCheckAnswers === "object" ? req.body.knowledgeCheckAnswers : (prior.knowledgeCheckAnswers || {});
+      const capstoneAnswers = req.body.capstoneAnswers && typeof req.body.capstoneAnswers === "object" ? req.body.capstoneAnswers : (prior.capstoneAnswers || {});
+      const capstoneSubmitted = typeof req.body.capstoneSubmitted === "boolean" ? req.body.capstoneSubmitted : !!prior.capstoneSubmitted;
+      const capstoneAttempts = Number.isFinite(Number(req.body.capstoneAttempts)) ? Number(req.body.capstoneAttempts) : (Number(prior.capstoneAttempts) || 0);
+      const capstoneBest = req.body.capstoneBest === null || req.body.capstoneBest === undefined || !Number.isFinite(Number(req.body.capstoneBest)) ? (prior.capstoneBest ?? null) : Number(req.body.capstoneBest);
       current[course] = {
         completedVideos,
         completedChecks,
         capstoneScore,
+        knowledgeCheckAnswers,
+        capstoneAnswers,
+        capstoneSubmitted,
+        capstoneAttempts,
+        capstoneBest,
         completedAt: req.body.completed ? (prior.completedAt || new Date().toISOString()) : (prior.completedAt || null),
         updatedAt: new Date().toISOString()
       };

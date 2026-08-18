@@ -3,7 +3,7 @@
   var SESSION_KEY = "lam-fi-academy-session:v1";
   var allowedDestinations = ["fi101.html", "high-yield.html", "emerging-market-debt.html"];
   function session() { try { var value = window.localStorage.getItem(SESSION_KEY); return value ? JSON.parse(value) : null; } catch (error) { return null; } }
-  function saveSession(learner) { var value = { id: learner.id, fullName: learner.fullName, email: learner.email }; window.localStorage.setItem(SESSION_KEY, JSON.stringify(value)); return value; }
+  function saveSession(learner) { var value = { id: learner.id, fullName: learner.fullName, email: learner.email, courseProgress: learner.courseProgress || {} }; window.localStorage.setItem(SESSION_KEY, JSON.stringify(value)); return value; }
   function destination(value) { return allowedDestinations.indexOf(value) !== -1 ? value : "fi101.html"; }
   function videoKey(course) { return "lam-fi-video-complete:" + course + ":v1"; }
   function videoComplete(course) { return window.localStorage.getItem(videoKey(course)) === "true"; }
@@ -20,8 +20,22 @@
         completedVideos: progress.completedVideos || (videoComplete(course) ? [course] : []),
         completedChecks: progress.completedChecks || [],
         capstoneScore: progress.capstoneScore,
+        knowledgeCheckAnswers: progress.knowledgeCheckAnswers,
+        capstoneAnswers: progress.capstoneAnswers,
+        capstoneSubmitted: progress.capstoneSubmitted,
+        capstoneAttempts: progress.capstoneAttempts,
+        capstoneBest: progress.capstoneBest,
         completed: !!progress.completed
       })
+    }).then(function (response) {
+      if (!response.ok) return null;
+      return response.json();
+    }).then(function (result) {
+      if (result && result.courseProgress) {
+        learner.courseProgress = result.courseProgress;
+        window.localStorage.setItem(SESSION_KEY, JSON.stringify(learner));
+      }
+      return result;
     }).catch(function () { return null; });
   }
   function applyVideoGate(course) {
@@ -39,6 +53,7 @@
     render();
   }
   window.LamAcademy = { session: session, saveSession: saveSession, destination: destination, updateCourse: updateCourse };
+  window.dispatchEvent(new Event("lamacademyready"));
   var current = document.currentScript;
   var course = current && current.dataset.course;
   if (course && !session()) { window.location.replace("index.html"); return; }
