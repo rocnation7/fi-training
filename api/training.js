@@ -1,5 +1,5 @@
 const ANSWER_KEY = [1, 2, 1, 1, 1, 1, 2, 1, 2, 0, 1, 1, 1, 1, 2];
-const COURSES = ["fi101", "high-yield", "emerging-market-debt"];
+const COURSES = ["fi101", "high-yield", "emerging-market-debt", "subordinated-financial-debt"];
 
 function response(res, status, body) {
   res.status(status).json(body);

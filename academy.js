@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var SESSION_KEY = "lam-fi-academy-session:v1";
-  var allowedDestinations = ["fi101.html", "high-yield.html", "emerging-market-debt.html"];
+  var allowedDestinations = ["fi101.html", "high-yield.html", "emerging-market-debt.html", "subordinated-financial-debt.html"];
   function session() { try { var value = window.localStorage.getItem(SESSION_KEY); return value ? JSON.parse(value) : null; } catch (error) { return null; } }
   function saveSession(learner) { var value = { id: learner.id, fullName: learner.fullName, email: learner.email, courseProgress: learner.courseProgress || {} }; window.localStorage.setItem(SESSION_KEY, JSON.stringify(value)); return value; }
   function destination(value) { return allowedDestinations.indexOf(value) !== -1 ? value : "fi101.html"; }
